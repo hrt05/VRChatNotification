@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
-using System.Media;
 using System.Windows;
+using System.Windows.Media;
 
 namespace VRChatNotification
 {
@@ -13,15 +13,22 @@ namespace VRChatNotification
         public MainWindow()
         {
             InitializeComponent();
+
+            //_player.Volume = 0.1;
         }
+
+        private MediaPlayer _player = new MediaPlayer();
 
         private async Task PlaySound()
         {
             // C:\Users\kouki\source\repos\VRChatNotification\VRChatNotification\bin\Debug\net10.0-windows
             // C:\Users\kouki\source\repos\VRChatNotification\VRChatNotification\bin\Debug\net10.0-windows/sound/joinSound.wav
 
-            var player = new SoundPlayer(Path.Combine(Directory.GetCurrentDirectory(), "sound", "joinSound.wav"));
-            player.Play();
+            string soundPath = Path.Combine(Directory.GetCurrentDirectory(), "sound", "joinSound.wav");
+
+            _player.Open(new Uri(soundPath));
+
+            _player.Play();
         }
 
         private async void Ignition(object sender, RoutedEventArgs e)
@@ -37,6 +44,12 @@ namespace VRChatNotification
             {
                 Debug.WriteLine(ex);
             }
+        }
+
+        private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Debug.WriteLine("現在の値" + e.NewValue / 100);
+            _player.Volume = e.NewValue / 100;
         }
     }
 }
