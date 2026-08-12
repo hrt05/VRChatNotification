@@ -16,22 +16,33 @@ namespace VRChatNotification
             Task.Run(() => ReadFile());
         }
 
-        public enum LogType
-        {
-            Unknown,
-            PlayerJoin,
-            PlayerLeft,
-        }
+        //public enum LogType
+        //{
+        //    Unknown,
+        //    PlayerJoin,
+        //    PlayerLeft,
+        //}
 
         /* 
          * 変数などをここに記載
          */
 
         //private CancellationToken? _ct;
+        // ↓取り消す必要があることを CancellationToken に通知します。
         private CancellationTokenSource? _cts;
         private MediaPlayer _player = new MediaPlayer();
-        private string _soundPath = Path.Combine(Directory.GetCurrentDirectory(), "sound", "joinSound.wav");
+        private string _joinSoundPath = Path.Combine(Directory.GetCurrentDirectory(), "sound", "joinSound.wav");
+        private string _leftSoundPath = Path.Combine(Directory.GetCurrentDirectory(), "sound", "leftSound.wav");
         private string _logDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "Low", "VRChat", "VRChat");
+        private bool _interrupt = true;
+        public enum c {
+            Unknown,
+            Public,
+            Hidden,
+            Friends,
+            Private
+        };
+        private InstanceType _nowInstance = InstanceType.Unknown;
 
         /* 
          * 関数などをここに記載
@@ -39,22 +50,50 @@ namespace VRChatNotification
 
 
         // 音楽の再生準備
-        private async Task PlaySound()
+        private async Task PlayJoinSound()
         {
-            _player.Open(new Uri(_soundPath));
+            _player.Open(new Uri(_joinSoundPath));
             _player.Play();
         }
+
+        private async Task PlayLeftSound()
+        {
+            _player.Open(new Uri(_leftSoundPath));
+            _player.Play();
+        }
+
 
         // ボタンを押した際に、上記の関数を再生
         private async void Ignition(object sender, RoutedEventArgs e)
         {
             try
             {
-                await PlaySound();
+                await PlayJoinSound();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
+            }
+        }
+
+        // 中断再生ボタン
+        private void boolButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_interrupt == true)
+            {
+                _cts?.Cancel();
+                _interrupt = false;
+                Debug.WriteLine("今中断しました");
+            }
+            else if(_interrupt == false)
+            {
+                Task.Run(() => ReadFile());
+                _interrupt = true;
+                Debug.WriteLine("今再開しました");
+            }
+            else
+            {
+                return;
             }
         }
 
@@ -71,12 +110,12 @@ namespace VRChatNotification
         //    ReadFile();
         //}
 
-        private LogType AnalysisDef(string log)
-        {
-            Debug.WriteLine("logの中身", log);
+        //private LogType AnalysisDef(string log)
+        //{
+        //    Debug.WriteLine("logの中身", log);
 
-            return LogType.Unknown;
-        }
+        //    return LogType.Unknown;
+        //}
 
         private FileInfo? LatestRogFile()
         {
@@ -88,11 +127,15 @@ namespace VRChatNotification
                 return latestF;
         }
 
-        private void AnalysisSound(string line)
+        private async Task AnalysisSound(string line)
         {
             if (line.Contains("[Behaviour] OnPlayerJoined"))
             {
-                Dispatcher.Invoke(() => PlaySound());
+                await PlayJoinSound();
+            }
+            else if (line.Contains("[Behaviour] OnPlayerLeft"))
+            {
+                await PlayLeftSound();
             }
         }
 
@@ -119,18 +162,15 @@ namespace VRChatNotification
 
 
 
-                // 全行
-                //string? line;
-                //line = sr.ReadLine();
+                // 初回全行読み込み
                 while (sr.ReadLine() != null)
                 {
                     //AnalysisDef(line);
                 }
 
+                // ここから情報が変わったら処理
                 _cts = new CancellationTokenSource();
-                //_ct = new CancellationTokenSource().Token;
 
-                //while (_ct is CancellationToken token && !token.IsCancellationRequested)
                 while (!_cts.Token.IsCancellationRequested)
                     {
                     string? line;
@@ -145,6 +185,11 @@ namespace VRChatNotification
                         await Task.Delay(500, _cts.Token);
                     }
                 }
+
+            }
+            catch (TaskCanceledException)
+            {
+                Debug.WriteLine("停止しました。");
             }
             catch (Exception ex)
             {
@@ -153,9 +198,5 @@ namespace VRChatNotification
             }
         }
 
-        private void boolButton_Click(object sender, RoutedEventArgs e)
-        {
-            _cts?.Cancel();
-        }
     }
 }

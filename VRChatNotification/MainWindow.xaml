@@ -5,11 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VRChatNotification"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800" Background="#FFF3F3F3">
     <Grid>
         <Slider HorizontalAlignment="Left" Margin="50,367,0,0" VerticalAlignment="Top" Width="120" Maximum="100" Value="100" ValueChanged="Slider_ValueChanged"/>
-        <Button Content="Test" HorizontalAlignment="Left" Margin="630,0,0,0" VerticalAlignment="Center" Click="Ignition" Height="76" Width="128"/>
-        <Button x:Name="boolButton" Content="Button" HorizontalAlignment="Left" Margin="630,333,0,0" VerticalAlignment="Top" Width="128" Height="76" Click="boolButton_Click"/>
+        <Button Content="Test" HorizontalAlignment="Left" Margin="630,0,0,0" VerticalAlignment="Center" Click="Ignition" Height="76" Width="128" Background="White"/>
+        <Button x:Name="boolButton" Content="Button" HorizontalAlignment="Left" Margin="630,333,0,0" VerticalAlignment="Top" Width="128" Height="76" Click="boolButton_Click" Background="White"/>
 
     </Grid>
 </Window>
