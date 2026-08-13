@@ -13,7 +13,7 @@ namespace VRChatNotification
         public MainWindow()
         {
             InitializeComponent();
-            Task.Run(() => ReadFile());
+            _ = ReadFile();
         }
 
         //public enum LogType
@@ -22,6 +22,8 @@ namespace VRChatNotification
         //    PlayerJoin,
         //    PlayerLeft,
         //}
+
+        //public InstanceType CurrentInstanceType { get; private set; }
 
         /* 
          * 変数などをここに記載
@@ -35,29 +37,24 @@ namespace VRChatNotification
         private string _leftSoundPath = Path.Combine(Directory.GetCurrentDirectory(), "sound", "leftSound.wav");
         private string _logDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "Low", "VRChat", "VRChat");
         private bool _interrupt = true;
-        public enum c {
-            Unknown,
-            Public,
-            Hidden,
-            Friends,
-            Private
-        };
-        private InstanceType _nowInstance = InstanceType.Unknown;
+        
+        public InstanceType _currentInstance { get; private set; } = InstanceType.Unknown;
 
         /* 
          * 関数などをここに記載
          */
 
-
         // 音楽の再生準備
         private async Task PlayJoinSound()
         {
+            Debug.WriteLine("ここ疎通確認。2");
             _player.Open(new Uri(_joinSoundPath));
             _player.Play();
         }
 
         private async Task PlayLeftSound()
         {
+            Debug.WriteLine("ここ疎通確認。3");
             _player.Open(new Uri(_leftSoundPath));
             _player.Play();
         }
@@ -69,6 +66,7 @@ namespace VRChatNotification
             try
             {
                 await PlayJoinSound();
+                //currentInstanceText.Text = "noJoinInstance";
             }
             catch (Exception ex)
             {
@@ -129,6 +127,7 @@ namespace VRChatNotification
 
         private async Task AnalysisSound(string line)
         {
+            //Debug.WriteLine("ここ疎通確認。");
             if (line.Contains("[Behaviour] OnPlayerJoined"))
             {
                 await PlayJoinSound();
@@ -178,7 +177,7 @@ namespace VRChatNotification
 
                     if (line != null)
                     {
-                        AnalysisSound(line);
+                        await AnalysisSound(line);
                     }
                     else
                     {
