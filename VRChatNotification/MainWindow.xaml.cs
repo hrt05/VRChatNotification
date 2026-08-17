@@ -147,8 +147,14 @@ namespace VRChatNotification
                 _isWorld = true;
             } else if (line.Contains("VRCApplication: HandleApplicationQuit"))
             {
+                _cts?.Cancel();
+                   /** 
+                    後で確認なのですが、中断せずvrc落としても続けたい人が居るのでは？
+                    */
+                //_interrupt = false;
                 _isWorld = false;
-                Dispatcher.Invoke(() => authUserIdTextBlock.Text = "noAuthUser");
+                Dispatcher.Invoke(() => authUserNameTextBlock.Text = "オフライン");
+                Dispatcher.Invoke(() => authUserIdTextBlock.Text = "");
             }
         }
 
