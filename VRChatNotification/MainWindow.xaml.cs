@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Media;
 
@@ -13,23 +14,28 @@ namespace VRChatNotification
         public MainWindow()
         {
             InitializeComponent();
-            _ = ReadFile();
+            Task.Run(() => ReadFile());
+            authUserNameTextBlock.Text = "ユーザーネーム不明";
+            authUserIdTextBlock.Text = "ユーザーID不明";
         }
+        //public InstanceType CurrentInstanceType { get; private set; }
 
         //public enum LogType
         //{
-        //    Unknown,
-        //    PlayerJoin,
-        //    PlayerLeft,
+        //    // 全プレイヤージョイン
+        //    OnPlayerJoined,
+        //    // 全プレイヤーレフト
+        //    OnPlayerLeft,
+        //    // 自分が初回join
+        //    Joining,
+        //    // 自分がシャットダウン
+        //    HandleApplicationQuit,
         //}
-
-        //public InstanceType CurrentInstanceType { get; private set; }
 
         /* 
          * 変数などをここに記載
          */
 
-        //private CancellationToken? _ct;
         // ↓取り消す必要があることを CancellationToken に通知します。
         private CancellationTokenSource? _cts;
         private MediaPlayer _player = new MediaPlayer();
@@ -37,6 +43,9 @@ namespace VRChatNotification
         private string _leftSoundPath = Path.Combine(Directory.GetCurrentDirectory(), "sound", "leftSound.wav");
         private string _logDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "Low", "VRChat", "VRChat");
         private bool _interrupt = true;
+        private bool _isWorld = true;
+        private string _userName = "unknown User";
+        private string _authUserId = "noAuthUser";
         
         public InstanceType _currentInstance { get; private set; } = InstanceType.Unknown;
 
@@ -59,6 +68,11 @@ namespace VRChatNotification
             _player.Play();
         }
 
+        //public class Log
+        //{
+        //    public string Judgement
+        //}
+
 
         // ボタンを押した際に、上記の関数を再生
         private async void Ignition(object sender, RoutedEventArgs e)
@@ -66,7 +80,6 @@ namespace VRChatNotification
             try
             {
                 await PlayJoinSound();
-                //currentInstanceText.Text = "noJoinInstance";
             }
             catch (Exception ex)
             {
@@ -102,19 +115,6 @@ namespace VRChatNotification
             _player.Volume = e.NewValue / 100;
         }
 
-        // テストボタンです。　後で消してください。
-        //private void logCheck_Click(object sender, RoutedEventArgs e)
-        //{
-        //    ReadFile();
-        //}
-
-        //private LogType AnalysisDef(string log)
-        //{
-        //    Debug.WriteLine("logの中身", log);
-
-        //    return LogType.Unknown;
-        //}
-
         private FileInfo? LatestRogFile()
         {
             var latestF = Directory.GetFiles(_logDir, "output_log_*.txt")
@@ -125,18 +125,56 @@ namespace VRChatNotification
                 return latestF;
         }
 
-        private async Task AnalysisSound(string line)
+        private void AnalysisSound(string line)
         {
-            //Debug.WriteLine("ここ疎通確認。");
-            if (line.Contains("[Behaviour] OnPlayerJoined"))
+            if (line.Contains("[Behaviour] OnPlayerJoined") && !line.Contains(_authUserId) && _isWorld == true)
             {
-                await PlayJoinSound();
+                Dispatcher.Invoke(() => PlayJoinSound());
             }
-            else if (line.Contains("[Behaviour] OnPlayerLeft"))
+            else if (line.Contains("[Behaviour] OnPlayerLeft") && !line.Contains(_authUserId) && _isWorld == true)
             {
-                await PlayLeftSound();
+                Dispatcher.Invoke(() => PlayLeftSound());
+            } else if (line.Contains("[Behaviour] OnLeftRoom"))
+            {
+                _isWorld = false;
+                //} else if (line.Contains("[Behaviour] Successfully joined room")) 
+                //{
+                //    //Thread.Sleep(300);
+                //    _isWorld = true;
+            }
+            else if (line.Contains("[Behaviour] OnPlayerJoined") && line.Contains(_userName))
+            {
+                _isWorld = true;
+            } else if (line.Contains("VRCApplication: HandleApplicationQuit"))
+            {
+                _isWorld = false;
+                Dispatcher.Invoke(() => authUserIdTextBlock.Text = "noAuthUser");
             }
         }
+
+
+
+        // AuthUser確認
+
+        // 最後の位置確認(もしvrc起動していなかったらOffline表記)
+        private void FirstLogDef(string fLine)
+        {
+            if (fLine.Contains("User Authenticated"))
+            {
+                Match regexName = Regex.Match(fLine, @"User Authenticated: (.+?) \(");
+                Match regexId = Regex.Match(fLine, @"usr_[a-f0-9-]+");
+                if (regexId.Success && regexName.Success)
+                {
+                    _userName = regexName.Groups[1].Value;
+                    _authUserId = regexId.Value;
+                    Dispatcher.Invoke(() => authUserNameTextBlock.Text =  _userName);
+                    Dispatcher.Invoke(() => authUserIdTextBlock.Text = _authUserId);
+                }
+            }
+        }
+        //{
+
+        //}
 
         private async Task ReadFile()
         {
@@ -160,11 +198,16 @@ namespace VRChatNotification
                 using var sr = new StreamReader(rf);
 
 
-
                 // 初回全行読み込み
                 while (sr.ReadLine() != null)
                 {
-                    //AnalysisDef(line);
+                    string? firstLine;
+                    firstLine = sr.ReadLine();
+                    //Debug.WriteLine(sr.ReadLine());
+                    if (firstLine != null)
+                    {
+                        FirstLogDef(firstLine);
+                    }
                 }
 
                 // ここから情報が変わったら処理
@@ -177,7 +220,7 @@ namespace VRChatNotification
 
                     if (line != null)
                     {
-                        await AnalysisSound(line);
+                        AnalysisSound(line);
                     }
                     else
                     {
