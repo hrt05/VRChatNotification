@@ -205,15 +205,11 @@ namespace VRChatNotification
 
 
                 // 初回全行読み込み
-                while (sr.ReadLine() != null)
+                string? firstLine;
+                while ((firstLine = sr.ReadLine()) != null)
                 {
-                    string? firstLine;
-                    firstLine = sr.ReadLine();
-                    //Debug.WriteLine(sr.ReadLine());
-                    if (firstLine != null)
-                    {
-                        FirstLogDef(firstLine);
-                    }
+                    Debug.WriteLine(firstLine);
+                    FirstLogDef(firstLine);
                 }
 
                 // ここから情報が変わったら処理
