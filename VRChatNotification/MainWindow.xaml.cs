@@ -32,6 +32,19 @@ namespace VRChatNotification
         //    HandleApplicationQuit,
         //}
 
+        public enum InstanceType
+        {
+            Public,
+            GroupPublic,
+            GroupPlus,
+            Group,
+            Hidden,
+            Friends,
+            PrivatePlus,
+            Private,
+            Unknown,
+        }
+
         /* 
          * 変数などをここに記載
          */
@@ -46,7 +59,8 @@ namespace VRChatNotification
         private bool _isWorld = true;
         private string _userName = "unknown User";
         private string _authUserId = "noAuthUser";
-        
+        private string _isThere = "noInstance";
+
         public InstanceType _currentInstance { get; private set; } = InstanceType.Unknown;
 
         /* 
@@ -96,7 +110,7 @@ namespace VRChatNotification
                 _interrupt = false;
                 Debug.WriteLine("今中断しました");
             }
-            else if(_interrupt == false)
+            else if (_interrupt == false)
             {
                 Task.Run(() => ReadFile());
                 _interrupt = true;
@@ -122,7 +136,7 @@ namespace VRChatNotification
                 .OrderByDescending(f => f.LastWriteTime)
                 .FirstOrDefault();
 
-                return latestF;
+            return latestF;
         }
 
         private void AnalysisSound(string line)
@@ -134,9 +148,12 @@ namespace VRChatNotification
             else if (line.Contains("[Behaviour] OnPlayerLeft") && !line.Contains(_authUserId) && _isWorld == true)
             {
                 Dispatcher.Invoke(() => PlayLeftSound());
-            } else if (line.Contains("[Behaviour] OnLeftRoom"))
+            }
+            else if (line.Contains("[Behaviour] OnLeftRoom"))
             {
                 _isWorld = false;
+                _currentInstance = InstanceType.Unknown;
+                Dispatcher.Invoke(() => currentInstanceText.Text= "所在地無し");
                 //} else if (line.Contains("[Behaviour] Successfully joined room")) 
                 //{
                 //    //Thread.Sleep(300);
@@ -145,17 +162,84 @@ namespace VRChatNotification
             else if (line.Contains("[Behaviour] OnPlayerJoined") && line.Contains(_userName))
             {
                 _isWorld = true;
-            } else if (line.Contains("VRCApplication: HandleApplicationQuit"))
+            }
+            else if (line.Contains("VRCApplication: HandleApplicationQuit"))
             {
                 _cts?.Cancel();
-                   /** 
-                    後で確認なのですが、中断せずvrc落としても続けたい人が居るのでは？
-                    */
+                /** 
+                 後で確認なのですが、中断せずvrc落としても続けたい人が居るのでは？
+                 */
                 //_interrupt = false;
                 _isWorld = false;
                 Dispatcher.Invoke(() => authUserNameTextBlock.Text = "オフライン");
                 Dispatcher.Invoke(() => authUserIdTextBlock.Text = "");
             }
+
+
+            if (line.Contains("[Behaviour] Joining wrld_"))
+            {
+                mutualInstanceType(line);
+            }
+        }
+
+        private void mutualInstanceType(string line)
+        {
+            // インバイト
+            if (line.Contains("private"))
+            {
+                Dispatcher.Invoke(() => currentInstanceText.Text = "インバイト");
+                _currentInstance = InstanceType.Private;
+            }
+            // インバイト+
+            else if (line.Contains("private") && line.Contains("canRequestInvite"))
+            {
+                Dispatcher.Invoke(() => currentInstanceText.Text = "インバイト+");
+                _currentInstance = InstanceType.PrivatePlus;
+            }
+            // フレンド
+            else if (line.Contains("friends"))
+            {
+                Dispatcher.Invoke(() => currentInstanceText.Text = "フレンド");
+                _currentInstance = InstanceType.Friends;
+            }
+            // フレンド+
+            else if (line.Contains("hidden"))
+            {
+                Dispatcher.Invoke(() => currentInstanceText.Text = "フレンド+");
+                _currentInstance = InstanceType.Hidden;
+            }
+            // グループ
+            else if (line.Contains("group") && line.Contains("groupAccessType(members)"))
+            {
+                Dispatcher.Invoke(() => currentInstanceText.Text = "グループ");
+                _currentInstance = InstanceType.Group;
+            }
+            // グループ+
+            else if (line.Contains("group") && line.Contains("groupAccessType(plus)"))
+            {
+                Dispatcher.Invoke(() => currentInstanceText.Text = "グループ+");
+                _currentInstance = InstanceType.GroupPlus;
+            }
+            // グループパブリック
+            else if (line.Contains("group") && line.Contains("groupAccessType(public)"))
+            {
+                Dispatcher.Invoke(() => currentInstanceText.Text = "グループパブリック");
+                _currentInstance = InstanceType.GroupPublic;
+            }
+            // パブリック
+            else if (line.Contains("region"))
+            {
+                Dispatcher.Invoke(() => currentInstanceText.Text = "パブリック");
+                _currentInstance = InstanceType.Public;
+            }
+            else
+            {
+                Dispatcher.Invoke(() => currentInstanceText.Text = "所在地無し");
+                _currentInstance = InstanceType.Unknown;
+                return;
+            }
+
+            //Dispatcher.Invoke(() => currentInstanceText.Text = $"{_currentInstance}");
         }
 
 
@@ -173,7 +257,7 @@ namespace VRChatNotification
                 {
                     _userName = regexName.Groups[1].Value;
                     _authUserId = regexId.Value;
-                    Dispatcher.Invoke(() => authUserNameTextBlock.Text =  _userName);
+                    Dispatcher.Invoke(() => authUserNameTextBlock.Text = _userName);
                     Dispatcher.Invoke(() => authUserIdTextBlock.Text = _authUserId);
                 }
             }
@@ -210,13 +294,20 @@ namespace VRChatNotification
                 {
                     Debug.WriteLine(firstLine);
                     FirstLogDef(firstLine);
+                    
+                    if (firstLine.Contains("[Behaviour] Joining wrld_"))
+                    {
+                        _isThere = firstLine;
+                    }
                 }
+
+                mutualInstanceType(_isThere);
 
                 // ここから情報が変わったら処理
                 _cts = new CancellationTokenSource();
 
                 while (!_cts.Token.IsCancellationRequested)
-                    {
+                {
                     string? line;
                     line = sr.ReadLine();
 
