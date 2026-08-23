@@ -16,6 +16,7 @@ namespace VRChatNotification
         {
             InitializeComponent();
             checkJson();
+            ApplySelectColors();
             Task.Run(() => ReadFile());
             authUserNameTextBlock.Text = "ユーザーネーム不明";
             authUserIdTextBlock.Text = "ユーザーID不明";
@@ -493,6 +494,34 @@ namespace VRChatNotification
             //var jsonReadData = sr.ReadToEnd();
 
             _selectClass = JsonSerializer.Deserialize<SelectClass>(jsonReadData) ?? new SelectClass();
+        }
+
+        private SolidColorBrush GetSelectColor(SelectType selectType)
+        {
+            switch (selectType)
+            {
+                case SelectType.NoSound:
+                    return noSoundColor;
+                case SelectType.JoinOnlySound:
+                    return joinOnlyColor;
+                case SelectType.JoinLeftSound:
+                    return joinLeftColor;
+
+                default:
+                    return noSoundColor;
+            }
+        }
+
+        private void ApplySelectColors()
+        {
+            publicBtn.Background = GetSelectColor(_selectClass.SelectPublic);
+            groupPublicBtn.Background = GetSelectColor(_selectClass.SelectGroupPublic);
+            groupPlusBtn.Background = GetSelectColor(_selectClass.SelectGroupPlus);
+            groupBtn.Background = GetSelectColor(_selectClass.SelectGroup);
+            hiddenBtn.Background = GetSelectColor(_selectClass.SelectHidden);
+            friendsBtn.Background = GetSelectColor(_selectClass.SelectFriends);
+            privatePlusBtn.Background = GetSelectColor(_selectClass.SelectPrivatePlus);
+            privateBtn.Background = GetSelectColor(_selectClass.SelectPrivate);
         }
     }
 }
