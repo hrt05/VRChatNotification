@@ -2,10 +2,14 @@
 {
     public enum InstanceType
     {
-        Unknown,
         Public,
+        GroupPublic,
+        GroupPlus,
+        Group,
         Hidden,
         Friends,
-        Private
+        PrivatePlus,
+        Private,
+        Unknown,
     };
 }

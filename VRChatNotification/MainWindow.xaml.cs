@@ -18,32 +18,6 @@ namespace VRChatNotification
             authUserNameTextBlock.Text = "ユーザーネーム不明";
             authUserIdTextBlock.Text = "ユーザーID不明";
         }
-        //public InstanceType CurrentInstanceType { get; private set; }
-
-        //public enum LogType
-        //{
-        //    // 全プレイヤージョイン
-        //    OnPlayerJoined,
-        //    // 全プレイヤーレフト
-        //    OnPlayerLeft,
-        //    // 自分が初回join
-        //    Joining,
-        //    // 自分がシャットダウン
-        //    HandleApplicationQuit,
-        //}
-
-        public enum InstanceType
-        {
-            Public,
-            GroupPublic,
-            GroupPlus,
-            Group,
-            Hidden,
-            Friends,
-            PrivatePlus,
-            Private,
-            Unknown,
-        }
 
         /* 
          * 変数などをここに記載
@@ -52,6 +26,7 @@ namespace VRChatNotification
         // ↓取り消す必要があることを CancellationToken に通知します。
         private CancellationTokenSource? _cts;
         private MediaPlayer _player = new MediaPlayer();
+        private InstanceTypeClass _instanceTypeClass = new InstanceTypeClass();
         private string _joinSoundPath = Path.Combine(Directory.GetCurrentDirectory(), "sound", "joinSound.wav");
         private string _leftSoundPath = Path.Combine(Directory.GetCurrentDirectory(), "sound", "leftSound.wav");
         private string _logDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "Low", "VRChat", "VRChat");
@@ -59,7 +34,7 @@ namespace VRChatNotification
         private bool _isWorld = true;
         private string _userName = "unknown User";
         private string _authUserId = "noAuthUser";
-        private string _isThere = "noInstance";
+        private string _wasThere = "noInstance";
 
         public InstanceType _currentInstance { get; private set; } = InstanceType.Unknown;
 
@@ -81,11 +56,6 @@ namespace VRChatNotification
             _player.Open(new Uri(_leftSoundPath));
             _player.Play();
         }
-
-        //public class Log
-        //{
-        //    public string Judgement
-        //}
 
 
         // ボタンを押した際に、上記の関数を再生
@@ -171,8 +141,10 @@ namespace VRChatNotification
                  */
                 //_interrupt = false;
                 _isWorld = false;
+                _currentInstance = InstanceType.Unknown;
                 Dispatcher.Invoke(() => authUserNameTextBlock.Text = "オフライン");
                 Dispatcher.Invoke(() => authUserIdTextBlock.Text = "");
+                Dispatcher.Invoke(() => currentInstanceText.Text = "停止中");
             }
 
 
@@ -184,62 +156,24 @@ namespace VRChatNotification
 
         private void mutualInstanceType(string line)
         {
-            // インバイト
-            if (line.Contains("private"))
-            {
-                Dispatcher.Invoke(() => currentInstanceText.Text = "インバイト");
-                _currentInstance = InstanceType.Private;
-            }
-            // インバイト+
-            else if (line.Contains("private") && line.Contains("canRequestInvite"))
-            {
-                Dispatcher.Invoke(() => currentInstanceText.Text = "インバイト+");
-                _currentInstance = InstanceType.PrivatePlus;
-            }
-            // フレンド
-            else if (line.Contains("friends"))
-            {
-                Dispatcher.Invoke(() => currentInstanceText.Text = "フレンド");
-                _currentInstance = InstanceType.Friends;
-            }
-            // フレンド+
-            else if (line.Contains("hidden"))
-            {
-                Dispatcher.Invoke(() => currentInstanceText.Text = "フレンド+");
-                _currentInstance = InstanceType.Hidden;
-            }
-            // グループ
-            else if (line.Contains("group") && line.Contains("groupAccessType(members)"))
-            {
-                Dispatcher.Invoke(() => currentInstanceText.Text = "グループ");
-                _currentInstance = InstanceType.Group;
-            }
-            // グループ+
-            else if (line.Contains("group") && line.Contains("groupAccessType(plus)"))
-            {
-                Dispatcher.Invoke(() => currentInstanceText.Text = "グループ+");
-                _currentInstance = InstanceType.GroupPlus;
-            }
-            // グループパブリック
-            else if (line.Contains("group") && line.Contains("groupAccessType(public)"))
-            {
-                Dispatcher.Invoke(() => currentInstanceText.Text = "グループパブリック");
-                _currentInstance = InstanceType.GroupPublic;
-            }
-            // パブリック
-            else if (line.Contains("region"))
-            {
-                Dispatcher.Invoke(() => currentInstanceText.Text = "パブリック");
-                _currentInstance = InstanceType.Public;
-            }
-            else
-            {
-                Dispatcher.Invoke(() => currentInstanceText.Text = "所在地無し");
-                _currentInstance = InstanceType.Unknown;
-                return;
-            }
+            _currentInstance = _instanceTypeClass.instanceTypeClassDef(line);
 
-            //Dispatcher.Invoke(() => currentInstanceText.Text = $"{_currentInstance}");
+            Dispatcher.Invoke(() =>
+            {
+                currentInstanceText.Text = _currentInstance switch
+                {
+                    InstanceType.Private => "インバイト",
+                    InstanceType.PrivatePlus => "インバイト+",
+                    InstanceType.Friends => "フレンド",
+                    InstanceType.Hidden => "フレンド+",
+                    InstanceType.Group => "グループ",
+                    InstanceType.GroupPlus => "グループ+",
+                    InstanceType.GroupPublic => "グループパブリック",
+                    InstanceType.Public => "パブリック",
+                    InstanceType.Unknown => "所在地無し",
+                    _ => "不明",
+                };
+            });
         }
 
 
@@ -262,9 +196,6 @@ namespace VRChatNotification
                 }
             }
         }
-        //{
-
-        //}
 
         private async Task ReadFile()
         {
@@ -297,11 +228,11 @@ namespace VRChatNotification
                     
                     if (firstLine.Contains("[Behaviour] Joining wrld_"))
                     {
-                        _isThere = firstLine;
+                        _wasThere = firstLine;
                     }
                 }
 
-                mutualInstanceType(_isThere);
+                mutualInstanceType(_wasThere);
 
                 // ここから情報が変わったら処理
                 _cts = new CancellationTokenSource();
@@ -332,6 +263,5 @@ namespace VRChatNotification
                 MessageBox.Show($"エラーが発生しました。{ex}");
             }
         }
-
     }
 }
