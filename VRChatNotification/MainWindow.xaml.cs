@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Media;
@@ -14,6 +15,7 @@ namespace VRChatNotification
         public MainWindow()
         {
             InitializeComponent();
+            checkJson();
             Task.Run(() => ReadFile());
             authUserNameTextBlock.Text = "ユーザーネーム不明";
             authUserIdTextBlock.Text = "ユーザーID不明";
@@ -26,6 +28,7 @@ namespace VRChatNotification
         // ↓取り消す必要があることを CancellationToken に通知します。
         private CancellationTokenSource? _cts;
         private MediaPlayer _player = new MediaPlayer();
+        private SelectClass _selectClass = new SelectClass();
         private InstanceTypeClass _instanceTypeClass = new InstanceTypeClass();
         private string _joinSoundPath = Path.Combine(Directory.GetCurrentDirectory(), "sound", "joinSound.wav");
         private string _leftSoundPath = Path.Combine(Directory.GetCurrentDirectory(), "sound", "leftSound.wav");
@@ -36,7 +39,26 @@ namespace VRChatNotification
         private string _authUserId = "noAuthUser";
         private string _wasThere = "noInstance";
 
-        public InstanceType _currentInstance { get; private set; } = InstanceType.Unknown;
+        string fileName = "SelectingInstance.json";
+        string _documentPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "VRCNotification");
+
+
+        public InstanceType currentInstance { get; private set; } = InstanceType.Unknown;
+
+
+
+        //public SelectType selectPublic { get; private set; } = SelectType.NoSound;
+        //public SelectType selectGroupPublic { get; private set; } = SelectType.NoSound;
+        //public SelectType selectGroupPlus { get; private set; } = SelectType.NoSound;
+        //public SelectType selectGroup { get; private set; } = SelectType.NoSound;
+        //public SelectType selectHidden { get; private set; } = SelectType.NoSound;
+        //public SelectType selectFriends { get; private set; } = SelectType.NoSound;
+        //public SelectType selectPrivatePlus { get; private set; } = SelectType.NoSound;
+        //public SelectType selectPrivate { get; private set; } = SelectType.NoSound;
+        //public SelectType selectUnknown { get; private set; } = SelectType.NoSound;
+
+        //var noSoundColor = (Color)
+
 
         /* 
          * 関数などをここに記載
@@ -122,7 +144,7 @@ namespace VRChatNotification
             else if (line.Contains("[Behaviour] OnLeftRoom"))
             {
                 _isWorld = false;
-                _currentInstance = InstanceType.Unknown;
+                currentInstance = InstanceType.Unknown;
                 Dispatcher.Invoke(() => currentInstanceText.Text= "所在地無し");
                 //} else if (line.Contains("[Behaviour] Successfully joined room")) 
                 //{
@@ -141,7 +163,7 @@ namespace VRChatNotification
                  */
                 //_interrupt = false;
                 _isWorld = false;
-                _currentInstance = InstanceType.Unknown;
+                currentInstance = InstanceType.Unknown;
                 Dispatcher.Invoke(() => authUserNameTextBlock.Text = "オフライン");
                 Dispatcher.Invoke(() => authUserIdTextBlock.Text = "");
                 Dispatcher.Invoke(() => currentInstanceText.Text = "停止中");
@@ -156,11 +178,11 @@ namespace VRChatNotification
 
         private void mutualInstanceType(string line)
         {
-            _currentInstance = _instanceTypeClass.instanceTypeClassDef(line);
+            currentInstance = _instanceTypeClass.instanceTypeClassDef(line);
 
             Dispatcher.Invoke(() =>
             {
-                currentInstanceText.Text = _currentInstance switch
+                currentInstanceText.Text = currentInstance switch
                 {
                     InstanceType.Private => "インバイト",
                     InstanceType.PrivatePlus => "インバイト+",
@@ -262,6 +284,215 @@ namespace VRChatNotification
                 Debug.WriteLine("エラーでてます", ex);
                 MessageBox.Show($"エラーが発生しました。{ex}");
             }
+        }
+
+        public SolidColorBrush noSoundColor = new SolidColorBrush(Color.FromRgb(255, 255, 255));
+        public SolidColorBrush joinOnlyColor = new SolidColorBrush(Color.FromRgb(178, 210, 210));
+        public SolidColorBrush joinLeftColor = new SolidColorBrush(Color.FromRgb(191, 178, 210));
+
+
+        private void publicBtn_Click(object sender, RoutedEventArgs e)
+        {
+            switch (_selectClass.SelectPublic)
+            {
+                case SelectType.NoSound:
+                    publicBtn.Background = joinOnlyColor;
+                    _selectClass.SelectPublic = SelectType.JoinOnlySound;
+                    changeJson();
+                    break;
+                case SelectType.JoinOnlySound:
+                    publicBtn.Background = joinLeftColor;
+                    _selectClass.SelectPublic = SelectType.JoinLeftSound;
+                    changeJson();
+                    break;
+                case SelectType.JoinLeftSound:
+                    publicBtn.Background = noSoundColor;
+                    _selectClass.SelectPublic = SelectType.NoSound;
+                    changeJson();
+                    break;
+            }
+        }
+
+        private void groupPublicBtn_Click(object sender, RoutedEventArgs e)
+        {
+            switch (_selectClass.SelectGroupPublic)
+            {
+                case SelectType.NoSound:
+                    groupPublicBtn.Background = joinOnlyColor;
+                    _selectClass.SelectGroupPublic = SelectType.JoinOnlySound;
+                    changeJson();
+                    break;
+                case SelectType.JoinOnlySound:
+                    groupPublicBtn.Background = joinLeftColor;
+                    _selectClass.SelectGroupPublic = SelectType.JoinLeftSound;
+                    changeJson();
+                    break;
+                case SelectType.JoinLeftSound:
+                    groupPublicBtn.Background = noSoundColor;
+                    _selectClass.SelectGroupPublic = SelectType.NoSound;
+                    changeJson();
+                    break;
+            }
+        }
+
+        private void groupPlusBtn_Click(object sender, RoutedEventArgs e)
+        {
+            switch (_selectClass.SelectGroupPlus)
+            {
+                case SelectType.NoSound:
+                    groupPlusBtn.Background = joinOnlyColor;
+                    _selectClass.SelectGroupPlus = SelectType.JoinOnlySound;
+                    changeJson();
+                    break;
+                case SelectType.JoinOnlySound:
+                    groupPlusBtn.Background = joinLeftColor;
+                    _selectClass.SelectGroupPlus = SelectType.JoinLeftSound;
+                    changeJson();
+                    break;
+                case SelectType.JoinLeftSound:
+                    groupPlusBtn.Background = noSoundColor;
+                    _selectClass.SelectGroupPlus = SelectType.NoSound;
+                    changeJson();
+                    break;
+            }
+        }
+
+        private void groupBtn_Click(object sender, RoutedEventArgs e)
+        {
+            switch (_selectClass.SelectGroup)
+            {
+                case SelectType.NoSound:
+                    groupBtn.Background = joinOnlyColor;
+                    _selectClass.SelectGroup = SelectType.JoinOnlySound;
+                    changeJson();
+                    break;
+                case SelectType.JoinOnlySound:
+                    groupBtn.Background = joinLeftColor;
+                    _selectClass.SelectGroup = SelectType.JoinLeftSound;
+                    changeJson();
+                    break;
+                case SelectType.JoinLeftSound:
+                    groupBtn.Background = noSoundColor;
+                    _selectClass.SelectGroup = SelectType.NoSound;
+                    changeJson();
+                    break;
+            }
+        }
+
+        private void hiddenBtn_Click(object sender, RoutedEventArgs e)
+        {
+            switch (_selectClass.SelectHidden)
+            {
+                case SelectType.NoSound:
+                    hiddenBtn.Background = joinOnlyColor;
+                    _selectClass.SelectHidden = SelectType.JoinOnlySound;
+                    changeJson();
+                    break;
+                case SelectType.JoinOnlySound:
+                    hiddenBtn.Background = joinLeftColor;
+                    _selectClass.SelectHidden = SelectType.JoinLeftSound;
+                    changeJson();
+                    break;
+                case SelectType.JoinLeftSound:
+                    hiddenBtn.Background = noSoundColor;
+                    _selectClass.SelectHidden = SelectType.NoSound;
+                    changeJson();
+                    break;
+            }
+        }
+
+        private void friendsBtn_Click(object sender, RoutedEventArgs e)
+        {
+            switch (_selectClass.SelectFriends)
+            {
+                case SelectType.NoSound:
+                    friendsBtn.Background = joinOnlyColor;
+                    _selectClass.SelectFriends = SelectType.JoinOnlySound;
+                    changeJson();
+                    break;
+                case SelectType.JoinOnlySound:
+                    friendsBtn.Background = joinLeftColor;
+                    _selectClass.SelectFriends = SelectType.JoinLeftSound;
+                    changeJson();
+                    break;
+                case SelectType.JoinLeftSound:
+                    friendsBtn.Background = noSoundColor;
+                    _selectClass.SelectFriends = SelectType.NoSound;
+                    changeJson();
+                    break;
+            }
+        }
+
+        private void privatePlusBtn_Click(object sender, RoutedEventArgs e)
+        {
+            switch (_selectClass.SelectPrivatePlus)
+            {
+                case SelectType.NoSound:
+                    privatePlusBtn.Background = joinOnlyColor;
+                    _selectClass.SelectPrivatePlus = SelectType.JoinOnlySound;
+                    changeJson();
+                    break;
+                case SelectType.JoinOnlySound:
+                    privatePlusBtn.Background = joinLeftColor;
+                    _selectClass.SelectPrivatePlus = SelectType.JoinLeftSound;
+                    changeJson();
+                    break;
+                case SelectType.JoinLeftSound:
+                    privatePlusBtn.Background = noSoundColor;
+                    _selectClass.SelectPrivatePlus = SelectType.NoSound;
+                    changeJson();
+                    break;
+            }
+        }
+
+        private void privateBtn_Click(object sender, RoutedEventArgs e)
+        {
+            switch (_selectClass.SelectPrivate)
+            {
+                case SelectType.NoSound:
+                    privateBtn.Background = joinOnlyColor;
+                    _selectClass.SelectPrivate = SelectType.JoinOnlySound;
+                    changeJson();
+                    break;
+                case SelectType.JoinOnlySound:
+                    privateBtn.Background = joinLeftColor;
+                    _selectClass.SelectPrivate = SelectType.JoinLeftSound;
+                    changeJson();
+                    break;
+                case SelectType.JoinLeftSound:
+                    privateBtn.Background = noSoundColor;
+                    _selectClass.SelectPrivate = SelectType.NoSound;
+                    changeJson();
+                    break;
+            }
+        }
+
+        private void changeJson()
+        {
+            string jsonString = JsonSerializer.Serialize(_selectClass, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+            if (!Directory.Exists(_documentPath))
+            {
+                Directory.CreateDirectory(_documentPath);
+            }
+            File.WriteAllText(Path.Combine(_documentPath, fileName), jsonString);
+        }
+
+        private void checkJson()
+        {
+            string jsonPath = Path.Combine(_documentPath, fileName);
+            if (!File.Exists(jsonPath))
+            {
+                return;
+            }
+            string jsonReadData = File.ReadAllText(jsonPath);
+
+            //using var sr = new StreamReader(_documentPath);
+            //var jsonReadData = sr.ReadToEnd();
+
+            _selectClass = JsonSerializer.Deserialize<SelectClass>(jsonReadData) ?? new SelectClass();
         }
     }
 }

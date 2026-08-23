@@ -12,4 +12,11 @@
         Private,
         Unknown,
     };
+
+    public enum SelectType
+    {
+        NoSound,
+        JoinOnlySound,
+        JoinLeftSound,
+    }
 }

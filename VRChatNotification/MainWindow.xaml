@@ -6,13 +6,62 @@
         xmlns:local="clr-namespace:VRChatNotification"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800" Background="#FFF3F3F3">
+    <Window.Resources>
+        <!-- 全てのボタンに自動適用される共通スタイル -->
+        <Style TargetType="Button">
+            <!-- 標準の枠線や文字色（必要に応じて調整してください） -->
+            <Setter Property="BorderBrush" Value="#CCCCCC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontSize" Value="14"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <!-- 各ボタンで指定された Background をそのまま背景にする -->
+                        <Border Background="{TemplateBinding Background}" 
+                            BorderBrush="{TemplateBinding BorderBrush}" 
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            SnapsToDevicePixels="True">
+                            <Grid>
+                                <!-- ホバー時に重ねる半透明の黒レイヤー -->
+                                <Border x:Name="HoverLayer" Background="Black" Opacity="0"/>
+
+                                <!-- ボタンの文字表示 -->
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <!-- マウスホバー時に15%の黒（灰色）を重ねる -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="HoverLayer" Property="Opacity" Value="0.15"/>
+                            </Trigger>
+                            <!-- ついでにクリックされた瞬間（押下時）はもう少し暗くする設定 -->
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="HoverLayer" Property="Opacity" Value="0.3"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Slider HorizontalAlignment="Left" Margin="50,367,0,0" VerticalAlignment="Top" Width="120" Maximum="100" Value="100" ValueChanged="Slider_ValueChanged"/>
-        <Button Content="Test" HorizontalAlignment="Left" Margin="630,174,0,0" VerticalAlignment="Top" Click="Ignition" Height="76" Width="128" Background="White"/>
+        <Button Content="確認" HorizontalAlignment="Left" Margin="226,333,0,0" VerticalAlignment="Top" Click="Ignition" Height="76" Width="40" Background="White"/>
         <Button x:Name="interruptButton" Content="中断:再生" HorizontalAlignment="Left" Margin="630,333,0,0" VerticalAlignment="Top" Width="128" Height="76" Click="boolButton_Click" Background="White"/>
         <TextBlock x:Name="currentInstanceText" HorizontalAlignment="Left" Margin="423,369,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
         <TextBlock x:Name="authUserIdTextBlock" HorizontalAlignment="Left" Margin="10,36,0,0" TextWrapping="Wrap" Text="UserId" VerticalAlignment="Top" Width="512"/>
         <TextBlock x:Name="authUserNameTextBlock" HorizontalAlignment="Left" Margin="10,20,0,0" TextWrapping="Wrap" Text="UserName" VerticalAlignment="Top" Width="512"/>
+        <Button x:Name="publicBtn" Content="パブリック" HorizontalAlignment="Left" Margin="30,88,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="publicBtn_Click"/>
+        <Button x:Name="groupPublicBtn" Content="グループパブリック" HorizontalAlignment="Left" Margin="394,88,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="groupPublicBtn_Click"/>
+        <Button x:Name="groupPlusBtn" Content="グループ+" HorizontalAlignment="Left" Margin="30,147,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="groupPlusBtn_Click"/>
+        <Button x:Name="groupBtn" Content="グループオンリー" HorizontalAlignment="Left" Margin="394,147,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="groupBtn_Click"/>
+        <Button x:Name="hiddenBtn" Content="フレンド+" HorizontalAlignment="Left" Margin="30,206,0,0" VerticalAlignment="Top" Height="59" Width="366" Background="White" Click="hiddenBtn_Click"/>
+        <Button x:Name="friendsBtn" Content="フレンドオンリー" HorizontalAlignment="Left" Margin="394,206,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="friendsBtn_Click"/>
+        <Button x:Name="privatePlusBtn" Content="インバイト+" HorizontalAlignment="Left" Margin="30,265,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="privatePlusBtn_Click"/>
+        <Button x:Name="privateBtn" Content="インバイトオンリー" HorizontalAlignment="Left" Margin="394,265,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="privateBtn_Click"/>
 
     </Grid>
 </Window>
