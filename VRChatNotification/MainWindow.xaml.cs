@@ -17,7 +17,9 @@ namespace VRChatNotification
             InitializeComponent();
             checkJson();
             ApplySelectColors();
+            _isLoading = true;
             Task.Run(() => ReadFile());
+            Task.Run(() => CheckProcess());
             authUserNameTextBlock.Text = "ユーザーネーム不明";
             authUserIdTextBlock.Text = "ユーザーID不明";
         }
@@ -28,6 +30,8 @@ namespace VRChatNotification
 
         // ↓取り消す必要があることを CancellationToken に通知します。
         private CancellationTokenSource? _cts;
+        private CancellationTokenSource? _ctsProcess;
+        private Task? _readFileTask;
         private MediaPlayer _player = new MediaPlayer();
         private SelectClass _selectClass = new SelectClass();
         private InstanceTypeClass _instanceTypeClass = new InstanceTypeClass();
@@ -39,26 +43,12 @@ namespace VRChatNotification
         private string _userName = "unknown User";
         private string _authUserId = "noAuthUser";
         private string _wasThere = "noInstance";
-
         string fileName = "SelectingInstance.json";
         string _documentPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "VRCNotification");
-
-
         public InstanceType currentInstance { get; private set; } = InstanceType.Unknown;
-
-
-
-        //public SelectType selectPublic { get; private set; } = SelectType.NoSound;
-        //public SelectType selectGroupPublic { get; private set; } = SelectType.NoSound;
-        //public SelectType selectGroupPlus { get; private set; } = SelectType.NoSound;
-        //public SelectType selectGroup { get; private set; } = SelectType.NoSound;
-        //public SelectType selectHidden { get; private set; } = SelectType.NoSound;
-        //public SelectType selectFriends { get; private set; } = SelectType.NoSound;
-        //public SelectType selectPrivatePlus { get; private set; } = SelectType.NoSound;
-        //public SelectType selectPrivate { get; private set; } = SelectType.NoSound;
-        //public SelectType selectUnknown { get; private set; } = SelectType.NoSound;
-
-        //var noSoundColor = (Color)
+        private bool _isLoading = false;
+        private bool _isOnline = false;
+        //private double currentVolume = 100;
 
 
         /* 
@@ -100,12 +90,15 @@ namespace VRChatNotification
             if (_interrupt == true)
             {
                 _cts?.Cancel();
+                _ctsProcess?.Cancel();
                 _interrupt = false;
                 Debug.WriteLine("今中断しました");
+                currentInstanceText.Text = "停止中";
             }
             else if (_interrupt == false)
             {
-                Task.Run(() => ReadFile());
+                _readFileTask = Task.Run(() => ReadFile());
+                Task.Run(() => CheckProcess());
                 _interrupt = true;
                 Debug.WriteLine("今再開しました");
             }
@@ -118,8 +111,16 @@ namespace VRChatNotification
         // スライダーを調整して、0~100を1/10にしています。
         private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            Debug.WriteLine("現在の値" + e.NewValue / 100);
+            Debug.WriteLine("現在の値" + e.NewValue);
             _player.Volume = e.NewValue / 100;
+            if (!_isLoading)
+            {
+                return;
+            }
+            currentVolumeText.Text = $"{e.NewValue:0}";
+            //currentVolume = e.NewValue;
+            _selectClass.CurrentVolume = (int)Math.Round(e.NewValue);
+            changeJson();
         }
 
         private FileInfo? LatestRogFile()
@@ -156,7 +157,7 @@ namespace VRChatNotification
             {
                 _isWorld = true;
             }
-            else if (line.Contains("VRCApplication: HandleApplicationQuit"))
+            else if (line.Contains("VRCApplication: HandleApplicationQuit") || _isOnline == false)
             {
                 _cts?.Cancel();
                 /** 
@@ -284,6 +285,64 @@ namespace VRChatNotification
             {
                 Debug.WriteLine("エラーでてます", ex);
                 MessageBox.Show($"エラーが発生しました。{ex}");
+            }
+        }
+
+        private async Task CheckProcess()
+        {
+            try
+            {
+                _ctsProcess = new CancellationTokenSource();
+                
+
+                while (!_ctsProcess.Token.IsCancellationRequested)
+                {
+                    Process[] localByName = Process.GetProcessesByName("VRChat");
+
+                    if (localByName.Length == 0)
+                    {
+                        //Console.WriteLine("含まれていません1");
+                        _isOnline = false;
+                        _cts?.Cancel();
+                        await Task.Delay(500, _ctsProcess.Token);
+                    }
+                    else
+                    {
+                        foreach (Process vrcProcess in localByName)
+                        {
+                            if (vrcProcess.ProcessName.Contains("VRChat"))
+                            {
+                                //Debug.WriteLine($"含まれています{vrcProcess.ProcessName}");
+                                //Console.WriteLine($"含まれています{vrcProcess.ProcessName}");
+                                if(_isOnline == false)
+                                {
+                                    if(_readFileTask == null || _readFileTask.IsCompleted)
+                                    {
+                                        _readFileTask = Task.Run(() => ReadFile());
+                                    }
+                                }
+                                _isOnline = true;
+                                await Task.Delay(500, _ctsProcess.Token);
+                            }
+                            else
+                            {
+                                //Debug.WriteLine("含まれていません2");
+                                //Console.WriteLine("含まれていません2");
+                                _isOnline = false;
+                                await Task.Delay(500, _ctsProcess.Token);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                Debug.WriteLine("停止しました。");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("checkprocessでエラーが発生しましたエラーでてます", ex);
+                MessageBox.Show($"checkprocessでエラーが発生しました。{ex}");
             }
         }
 
@@ -522,6 +581,12 @@ namespace VRChatNotification
             friendsBtn.Background = GetSelectColor(_selectClass.SelectFriends);
             privatePlusBtn.Background = GetSelectColor(_selectClass.SelectPrivatePlus);
             privateBtn.Background = GetSelectColor(_selectClass.SelectPrivate);
+            _isLoading = true;
+            volumeSlider.Value = _selectClass.CurrentVolume;
+            currentVolumeText.Text = $"{_selectClass.CurrentVolume:0}";
+            _isLoading = false;
         }
+
+
     }
 }
