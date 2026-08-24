@@ -48,10 +48,10 @@
         </Style>
     </Window.Resources>
     <Grid>
-        <Slider HorizontalAlignment="Left" Margin="50,367,0,0" VerticalAlignment="Top" Width="120" Maximum="100" Value="100" ValueChanged="Slider_ValueChanged"/>
+        <Slider x:Name="volumeSlider" HorizontalAlignment="Left" Margin="50,367,0,0" VerticalAlignment="Top" Width="120" Maximum="100" Value="100" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
         <Button Content="確認" HorizontalAlignment="Left" Margin="226,333,0,0" VerticalAlignment="Top" Click="Ignition" Height="76" Width="40" Background="White"/>
         <Button x:Name="interruptButton" Content="中断:再生" HorizontalAlignment="Left" Margin="630,333,0,0" VerticalAlignment="Top" Width="128" Height="76" Click="boolButton_Click" Background="White"/>
-        <TextBlock x:Name="currentInstanceText" HorizontalAlignment="Left" Margin="423,369,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
+        <TextBlock x:Name="currentInstanceText" HorizontalAlignment="Left" Margin="423,369,0,0" TextWrapping="Wrap" Text="ログ解析中" VerticalAlignment="Top"/>
         <TextBlock x:Name="authUserIdTextBlock" HorizontalAlignment="Left" Margin="10,36,0,0" TextWrapping="Wrap" Text="UserId" VerticalAlignment="Top" Width="512"/>
         <TextBlock x:Name="authUserNameTextBlock" HorizontalAlignment="Left" Margin="10,20,0,0" TextWrapping="Wrap" Text="UserName" VerticalAlignment="Top" Width="512"/>
         <Button x:Name="publicBtn" Content="パブリック" HorizontalAlignment="Left" Margin="30,88,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="publicBtn_Click"/>
@@ -62,6 +62,7 @@
         <Button x:Name="friendsBtn" Content="フレンドオンリー" HorizontalAlignment="Left" Margin="394,206,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="friendsBtn_Click"/>
         <Button x:Name="privatePlusBtn" Content="インバイト+" HorizontalAlignment="Left" Margin="30,265,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="privatePlusBtn_Click"/>
         <Button x:Name="privateBtn" Content="インバイトオンリー" HorizontalAlignment="Left" Margin="394,265,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="privateBtn_Click"/>
+        <TextBlock x:Name="currentVolumeText" HorizontalAlignment="Left" Margin="121,333,0,0" TextWrapping="Wrap" Text="音量：" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

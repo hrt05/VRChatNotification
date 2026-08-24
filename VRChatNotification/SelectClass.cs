@@ -11,5 +11,6 @@
         public SelectType SelectPrivatePlus { get; set; } = SelectType.NoSound;
         public SelectType SelectPrivate { get; set; } = SelectType.NoSound;
         public SelectType SelectUnknown { get; set; } = SelectType.NoSound;
+        public int CurrentVolume { get; set; } = 100;
     }
 }
