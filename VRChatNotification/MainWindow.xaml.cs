@@ -153,7 +153,7 @@ namespace VRChatNotification
             {
                 _isWorld = false;
                 currentInstance = InstanceType.Unknown;
-                Dispatcher.Invoke(() => currentInstanceText.Text= "所在地無し");
+                Dispatcher.Invoke(() => currentInstanceText.Text = "所在地無し");
                 //} else if (line.Contains("[Behaviour] Successfully joined room")) 
                 //{
                 //    //Thread.Sleep(300);
@@ -255,7 +255,7 @@ namespace VRChatNotification
                 {
                     Debug.WriteLine(firstLine);
                     FirstLogDef(firstLine);
-                    
+
                     if (firstLine.Contains("[Behaviour] Joining wrld_"))
                     {
                         _wasThere = firstLine;
@@ -299,7 +299,7 @@ namespace VRChatNotification
             try
             {
                 _ctsProcess = new CancellationTokenSource();
-                
+
 
                 while (!_ctsProcess.Token.IsCancellationRequested)
                 {
@@ -327,9 +327,9 @@ namespace VRChatNotification
                             {
                                 //Debug.WriteLine($"含まれています{vrcProcess.ProcessName}");
                                 //Console.WriteLine($"含まれています{vrcProcess.ProcessName}");
-                                if(_isOnline == false)
+                                if (_isOnline == false)
                                 {
-                                    if(_readFileTask == null || _readFileTask.IsCompleted)
+                                    if (_readFileTask == null || _readFileTask.IsCompleted)
                                     {
                                         _readFileTask = Task.Run(() => ReadFile());
                                     }
