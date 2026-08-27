@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Input;
 
 namespace VRChatNotification
 {
@@ -20,9 +21,23 @@ namespace VRChatNotification
             _isLoading = true;
             _readFileTask = Task.Run(() => ReadFile());
             Task.Run(() => CheckProcess());
-            authUserNameTextBlock.Text = "ユーザーネーム不明";
-            authUserIdTextBlock.Text = "ユーザーID不明";
+            //authUserNameTextBlock.Text = "ユーザーネーム不明";
+            //authUserIdTextBlock.Text = "ユーザーID不明";
+            interruptButton.Background = playColor;
             interruptButton.Content = "動作中";
+        }
+
+        private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ButtonState == MouseButtonState.Pressed)
+            {
+                DragMove();
+            }
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
 
         /* 
@@ -129,7 +144,7 @@ namespace VRChatNotification
             {
                 return;
             }
-            currentVolumeText.Text = $"{e.NewValue:0}";
+            currentVolumeText.Text = $"{e.NewValue:0}%";
             //currentVolume = e.NewValue;
             _selectClass.CurrentVolume = (int)Math.Round(e.NewValue);
             changeJson();
@@ -184,8 +199,8 @@ namespace VRChatNotification
                 //_interrupt = false;
                 _isWorld = false;
                 currentInstance = InstanceType.Unknown;
-                Dispatcher.Invoke(() => authUserNameTextBlock.Text = "オフライン");
-                Dispatcher.Invoke(() => authUserIdTextBlock.Text = "");
+                //Dispatcher.Invoke(() => authUserNameTextBlock.Text = "オフライン");
+                //Dispatcher.Invoke(() => authUserIdTextBlock.Text = "");
                 Dispatcher.Invoke(() => currentInstanceText.Text = "停止中");
             }
 
@@ -233,8 +248,8 @@ namespace VRChatNotification
                 {
                     _userName = regexName.Groups[1].Value;
                     _authUserId = regexId.Value;
-                    Dispatcher.Invoke(() => authUserNameTextBlock.Text = _userName);
-                    Dispatcher.Invoke(() => authUserIdTextBlock.Text = _authUserId);
+                    //Dispatcher.Invoke(() => authUserNameTextBlock.Text = _userName);
+                    //Dispatcher.Invoke(() => authUserIdTextBlock.Text = _authUserId);
                 }
             }
         }
@@ -608,7 +623,7 @@ namespace VRChatNotification
             privateBtn.Background = GetSelectColor(_selectClass.SelectPrivate);
             _isLoading = true;
             volumeSlider.Value = _selectClass.CurrentVolume;
-            currentVolumeText.Text = $"{_selectClass.CurrentVolume:0}";
+            currentVolumeText.Text = $"{_selectClass.CurrentVolume:0}%";
             _isLoading = false;
         }
 

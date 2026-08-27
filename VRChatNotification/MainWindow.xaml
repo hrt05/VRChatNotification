@@ -5,64 +5,905 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VRChatNotification"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" Background="#FFF3F3F3">
+        Title="VRChatNotification"
+        Height="450"
+        Width="800"
+        Background="Transparent"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        AllowsTransparency="True">
+
     <Window.Resources>
-        <!-- 全てのボタンに自動適用される共通スタイル -->
+
+        <!-- ======================================== -->
+        <!-- 共通ボタンスタイル -->
+        <!-- ======================================== -->
+
         <Style TargetType="Button">
-            <!-- 標準の枠線や文字色（必要に応じて調整してください） -->
-            <Setter Property="BorderBrush" Value="#CCCCCC"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="FontSize" Value="14"/>
+
+            <Setter Property="Background"
+                    Value="White"/>
+
+            <Setter Property="Foreground"
+                    Value="#333333"/>
+
+            <Setter Property="BorderBrush"
+                    Value="#DCDCDC"/>
+
+            <Setter Property="BorderThickness"
+                    Value="1"/>
+
+            <Setter Property="FontSize"
+                    Value="13"/>
+
+            <Setter Property="Cursor"
+                    Value="Hand"/>
 
             <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <!-- 各ボタンで指定された Background をそのまま背景にする -->
-                        <Border Background="{TemplateBinding Background}" 
-                            BorderBrush="{TemplateBinding BorderBrush}" 
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            SnapsToDevicePixels="True">
-                            <Grid>
-                                <!-- ホバー時に重ねる半透明の黒レイヤー -->
-                                <Border x:Name="HoverLayer" Background="Black" Opacity="0"/>
 
-                                <!-- ボタンの文字表示 -->
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Setter.Value>
+
+                    <ControlTemplate TargetType="Button">
+
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                SnapsToDevicePixels="True">
+
+                            <Grid>
+
+                                <!-- ホバー -->
+                                <Border x:Name="HoverLayer"
+                                        Background="Black"
+                                        Opacity="0"/>
+
+                                <!-- ボタン文字 -->
+                                <ContentPresenter
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"/>
+
                             </Grid>
+
                         </Border>
 
                         <ControlTemplate.Triggers>
-                            <!-- マウスホバー時に15%の黒（灰色）を重ねる -->
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="HoverLayer" Property="Opacity" Value="0.15"/>
-                            </Trigger>
-                            <!-- ついでにクリックされた瞬間（押下時）はもう少し暗くする設定 -->
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="HoverLayer" Property="Opacity" Value="0.3"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Window.Resources>
-    <Grid>
-        <Slider x:Name="volumeSlider" HorizontalAlignment="Left" Margin="50,367,0,0" VerticalAlignment="Top" Width="120" Maximum="100" Value="100" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
-        <Button Content="確認" HorizontalAlignment="Left" Margin="226,333,0,0" VerticalAlignment="Top" Click="Ignition" Height="76" Width="40" Background="White"/>
-        <Button x:Name="interruptButton" Content="中断:再生" HorizontalAlignment="Left" Margin="630,333,0,0" VerticalAlignment="Top" Width="128" Height="76" Click="boolButton_Click" Background="#FFC1E5ED"/>
-        <TextBlock x:Name="currentInstanceText" HorizontalAlignment="Left" Margin="423,369,0,0" TextWrapping="Wrap" Text="ログ解析中" VerticalAlignment="Top"/>
-        <TextBlock x:Name="authUserIdTextBlock" HorizontalAlignment="Left" Margin="10,36,0,0" TextWrapping="Wrap" Text="UserId" VerticalAlignment="Top" Width="512"/>
-        <TextBlock x:Name="authUserNameTextBlock" HorizontalAlignment="Left" Margin="10,20,0,0" TextWrapping="Wrap" Text="UserName" VerticalAlignment="Top" Width="512"/>
-        <Button x:Name="publicBtn" Content="パブリック" HorizontalAlignment="Left" Margin="30,88,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="publicBtn_Click"/>
-        <Button x:Name="groupPublicBtn" Content="グループパブリック" HorizontalAlignment="Left" Margin="394,88,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="groupPublicBtn_Click"/>
-        <Button x:Name="groupPlusBtn" Content="グループ+" HorizontalAlignment="Left" Margin="30,147,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="groupPlusBtn_Click"/>
-        <Button x:Name="groupBtn" Content="グループオンリー" HorizontalAlignment="Left" Margin="394,147,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="groupBtn_Click"/>
-        <Button x:Name="hiddenBtn" Content="フレンド+" HorizontalAlignment="Left" Margin="30,206,0,0" VerticalAlignment="Top" Height="59" Width="366" Background="White" Click="hiddenBtn_Click"/>
-        <Button x:Name="friendsBtn" Content="フレンドオンリー" HorizontalAlignment="Left" Margin="394,206,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="friendsBtn_Click"/>
-        <Button x:Name="privatePlusBtn" Content="インバイト+" HorizontalAlignment="Left" Margin="30,265,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="privatePlusBtn_Click"/>
-        <Button x:Name="privateBtn" Content="インバイトオンリー" HorizontalAlignment="Left" Margin="394,265,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="privateBtn_Click"/>
-        <TextBlock x:Name="currentVolumeText" HorizontalAlignment="Left" Margin="121,333,0,0" TextWrapping="Wrap" Text="音量：" VerticalAlignment="Top"/>
 
-    </Grid>
+                            <!-- マウスを乗せたとき -->
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+
+                                <Setter TargetName="HoverLayer"
+                                        Property="Opacity"
+                                        Value="0.08"/>
+
+                            </Trigger>
+
+                            <!-- 押しているとき -->
+                            <Trigger Property="IsPressed"
+                                     Value="True">
+
+                                <Setter TargetName="HoverLayer"
+                                        Property="Opacity"
+                                        Value="0.18"/>
+
+                            </Trigger>
+
+                            <!-- 無効時 -->
+                            <Trigger Property="IsEnabled"
+                                     Value="False">
+
+                                <Setter Property="Opacity"
+                                        Value="0.5"/>
+
+                            </Trigger>
+
+                        </ControlTemplate.Triggers>
+
+                    </ControlTemplate>
+
+                </Setter.Value>
+
+            </Setter>
+
+        </Style>
+
+
+        <!-- ======================================== -->
+        <!-- 下部カード -->
+        <!-- ======================================== -->
+
+        <Style x:Key="BottomCard"
+               TargetType="Border">
+
+            <Setter Property="Background"
+                    Value="White"/>
+
+            <Setter Property="BorderBrush"
+                    Value="#DDDDDD"/>
+
+            <Setter Property="BorderThickness"
+                    Value="1"/>
+
+            <Setter Property="CornerRadius"
+                    Value="10"/>
+
+        </Style>
+
+
+        <!-- ======================================== -->
+        <!-- 閉じるボタン -->
+        <!-- ======================================== -->
+
+        <Style x:Key="CloseButtonStyle"
+               TargetType="Button">
+
+            <Setter Property="Background"
+                    Value="Transparent"/>
+
+            <Setter Property="Foreground"
+                    Value="#555555"/>
+
+            <Setter Property="BorderThickness"
+                    Value="0"/>
+
+            <Setter Property="FontSize"
+                    Value="17"/>
+
+            <Setter Property="Cursor"
+                    Value="Hand"/>
+
+            <Setter Property="Template">
+
+                <Setter.Value>
+
+                    <ControlTemplate TargetType="Button">
+
+                        <!-- 右上の角丸に合わせる -->
+                        <Border x:Name="ButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="0,9,0,0">
+
+                            <ContentPresenter
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"/>
+
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+
+                            <!-- ホバー -->
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+
+                                <Setter TargetName="ButtonBorder"
+                                        Property="Background"
+                                        Value="#E8E8E8"/>
+
+                                <Setter Property="Foreground"
+                                        Value="#222222"/>
+
+                            </Trigger>
+
+                            <!-- 押しているとき -->
+                            <Trigger Property="IsPressed"
+                                     Value="True">
+
+                                <Setter TargetName="ButtonBorder"
+                                        Property="Background"
+                                        Value="#D0D0D0"/>
+
+                            </Trigger>
+
+                        </ControlTemplate.Triggers>
+
+                    </ControlTemplate>
+
+                </Setter.Value>
+
+            </Setter>
+
+        </Style>
+
+    </Window.Resources>
+
+
+    <!-- ============================================ -->
+    <!-- ウィンドウ本体 -->
+    <!-- ============================================ -->
+
+    <Border Background="#F5F5F5"
+            BorderBrush="#DDDDDD"
+            BorderThickness="1"
+            CornerRadius="10"
+            SnapsToDevicePixels="True">
+
+        <Grid>
+
+
+            <!-- ==================================== -->
+            <!-- 自作タイトルバー -->
+            <!-- ==================================== -->
+
+            <Border Height="34"
+                    VerticalAlignment="Top"
+                    Background="#F5F5F5"
+                    CornerRadius="10,10,0,0"
+                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+
+                <Grid>
+
+                    <!-- アプリタイトル -->
+
+                    <TextBlock Text="VRChatNotification"
+                               Margin="14,0,0,0"
+                               VerticalAlignment="Center"
+                               FontSize="12"
+                               FontWeight="SemiBold"
+                               Foreground="#333333"/>
+
+
+                    <!-- 閉じるボタン -->
+
+                    <Button Content="×"
+                            Width="40"
+                            Height="33"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Style="{StaticResource CloseButtonStyle}"
+                            Click="CloseButton_Click"/>
+
+                </Grid>
+
+            </Border>
+
+
+            <!-- ==================================== -->
+            <!-- メインコンテンツ -->
+            <!-- ==================================== -->
+
+            <Grid Margin="20,54,20,20">
+
+
+                <!-- ================================= -->
+                <!-- 行設定 -->
+                <!-- ================================= -->
+
+                <Grid.RowDefinitions>
+
+                    <!-- インスタンス設定タイトル -->
+                    <RowDefinition Height="35"/>
+
+                    <!-- インスタンス設定ボタン -->
+                    <RowDefinition Height="237"/>
+
+                    <!-- 説明 -->
+                    <RowDefinition Height="28"/>
+
+                    <!-- 下部 -->
+                    <RowDefinition Height="70"/>
+
+                </Grid.RowDefinitions>
+
+
+                <!-- ================================= -->
+                <!-- インスタンス設定タイトル -->
+                <!-- ================================= -->
+
+                <Border Grid.Row="0"
+                        Background="#FFD6D7DA"
+                        CornerRadius="10,10,0,0">
+
+                    <TextBlock Text="インスタンス設定"
+                               Margin="14,0,0,0"
+                               VerticalAlignment="Center"
+                               FontSize="13"
+                               Foreground="#333333"/>
+
+                </Border>
+
+
+                <!-- ================================= -->
+                <!-- インスタンス設定ボタン -->
+                <!-- ================================= -->
+
+                <Border Grid.Row="1"
+                        Background="White"
+                        BorderBrush="#DCDCDC"
+                        BorderThickness="1"
+                        CornerRadius="0,0,10,10">
+
+                    <Grid>
+
+
+                        <!-- 行 -->
+
+                        <Grid.RowDefinitions>
+
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+
+                        </Grid.RowDefinitions>
+
+
+                        <!-- 列 -->
+
+                        <Grid.ColumnDefinitions>
+
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+
+                        </Grid.ColumnDefinitions>
+
+
+                        <!-- ========================== -->
+                        <!-- 1行目 -->
+                        <!-- ========================== -->
+
+                        <!-- パブリック -->
+
+                        <Button x:Name="publicBtn"
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Content="パブリック"
+                                Background="White"
+                                Click="publicBtn_Click"/>
+
+
+                        <!-- グループパブリック -->
+
+                        <Button x:Name="groupPublicBtn"
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Content="グループパブリック"
+                                Background="White"
+                                Click="groupPublicBtn_Click"/>
+
+
+                        <!-- ========================== -->
+                        <!-- 2行目 -->
+                        <!-- ========================== -->
+
+                        <!-- グループ+ -->
+
+                        <Button x:Name="groupPlusBtn"
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Content="グループ+"
+                                Background="White"
+                                Click="groupPlusBtn_Click"/>
+
+
+                        <!-- グループオンリー -->
+
+                        <Button x:Name="groupBtn"
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                Content="グループオンリー"
+                                Background="White"
+                                Click="groupBtn_Click"/>
+
+
+                        <!-- ========================== -->
+                        <!-- 3行目 -->
+                        <!-- ========================== -->
+
+                        <!-- フレンド+ -->
+
+                        <Button x:Name="hiddenBtn"
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                Content="フレンド+"
+                                Background="White"
+                                Click="hiddenBtn_Click"/>
+
+
+                        <!-- フレンドオンリー -->
+
+                        <Button x:Name="friendsBtn"
+                                Grid.Row="2"
+                                Grid.Column="1"
+                                Content="フレンドオンリー"
+                                Background="White"
+                                Click="friendsBtn_Click"/>
+
+
+                        <!-- ========================== -->
+                        <!-- 4行目 -->
+                        <!-- ========================== -->
+
+                        <!-- インバイト+ -->
+                        <!-- 左下だけ角丸 -->
+
+                        <Button x:Name="privatePlusBtn"
+                                Grid.Row="3"
+                                Grid.Column="0"
+                                Content="インバイト+"
+                                Background="White"
+                                BorderBrush="#DCDCDC"
+                                BorderThickness="1"
+                                Click="privatePlusBtn_Click">
+
+                            <Button.Template>
+
+                                <ControlTemplate TargetType="Button">
+
+                                    <Border Background="{TemplateBinding Background}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            CornerRadius="0,0,0,10">
+
+                                        <Grid>
+
+                                            <!-- ホバー -->
+                                            <Border x:Name="HoverLayer"
+                                                    Background="Black"
+                                                    Opacity="0"
+                                                    CornerRadius="0,0,0,10"/>
+
+                                            <!-- 文字 -->
+                                            <ContentPresenter
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"/>
+
+                                        </Grid>
+
+                                    </Border>
+
+                                    <ControlTemplate.Triggers>
+
+                                        <Trigger Property="IsMouseOver"
+                                                 Value="True">
+
+                                            <Setter TargetName="HoverLayer"
+                                                    Property="Opacity"
+                                                    Value="0.08"/>
+
+                                        </Trigger>
+
+                                        <Trigger Property="IsPressed"
+                                                 Value="True">
+
+                                            <Setter TargetName="HoverLayer"
+                                                    Property="Opacity"
+                                                    Value="0.18"/>
+
+                                        </Trigger>
+
+                                    </ControlTemplate.Triggers>
+
+                                </ControlTemplate>
+
+                            </Button.Template>
+
+                        </Button>
+
+
+                        <!-- インバイトオンリー -->
+                        <!-- 右下だけ角丸 -->
+
+                        <Button x:Name="privateBtn"
+                                Grid.Row="3"
+                                Grid.Column="1"
+                                Content="インバイトオンリー"
+                                Background="White"
+                                BorderBrush="#DCDCDC"
+                                BorderThickness="1"
+                                Click="privateBtn_Click">
+
+                            <Button.Template>
+
+                                <ControlTemplate TargetType="Button">
+
+                                    <Border Background="{TemplateBinding Background}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            CornerRadius="0,0,10,0">
+
+                                        <Grid>
+
+                                            <!-- ホバー -->
+                                            <Border x:Name="HoverLayer"
+                                                    Background="Black"
+                                                    Opacity="0"
+                                                    CornerRadius="0,0,10,0"/>
+
+                                            <!-- 文字 -->
+                                            <ContentPresenter
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"/>
+
+                                        </Grid>
+
+                                    </Border>
+
+                                    <ControlTemplate.Triggers>
+
+                                        <Trigger Property="IsMouseOver"
+                                                 Value="True">
+
+                                            <Setter TargetName="HoverLayer"
+                                                    Property="Opacity"
+                                                    Value="0.08"/>
+
+                                        </Trigger>
+
+                                        <Trigger Property="IsPressed"
+                                                 Value="True">
+
+                                            <Setter TargetName="HoverLayer"
+                                                    Property="Opacity"
+                                                    Value="0.18"/>
+
+                                        </Trigger>
+
+                                    </ControlTemplate.Triggers>
+
+                                </ControlTemplate>
+
+                            </Button.Template>
+
+                        </Button>
+
+                    </Grid>
+
+                </Border>
+
+
+                <!-- ================================= -->
+                <!-- 説明 -->
+                <!-- ================================= -->
+
+                <Grid Grid.Row="2">
+
+
+                    <!-- 左側 -->
+
+                    <TextBlock Text="※クリックで変更できます"
+                               VerticalAlignment="Center"
+                               FontSize="11"
+                               Foreground="#666666"/>
+
+
+                    <!-- 右側：色の説明 -->
+
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center">
+
+
+                        <!-- 通知音無し -->
+
+                        <TextBlock Text="通知音無し"
+                                   FontSize="10"
+                                   Foreground="#666666"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,5,0"/>
+
+                        <Border Width="12"
+                                Height="12"
+                                Background="White"
+                                BorderBrush="#DDDDDD"
+                                BorderThickness="1"
+                                Margin="0,0,15,0"/>
+
+
+                        <!-- 入室のみ -->
+
+                        <TextBlock Text="入室のみ"
+                                   FontSize="10"
+                                   Foreground="#666666"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,5,0"/>
+
+                        <Border Width="12"
+                                Height="12"
+                                Background="#B2D2D2"
+                                Margin="0,0,15,0"/>
+
+
+                        <!-- 入退室含め -->
+
+                        <TextBlock Text="入退室含め"
+                                   FontSize="10"
+                                   Foreground="#666666"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,5,0"/>
+
+                        <Border Width="12"
+                                Height="12"
+                                Background="#BFB2D2"/>
+
+                    </StackPanel>
+
+                </Grid>
+
+
+                <!-- ================================= -->
+                <!-- 下部 -->
+                <!-- ================================= -->
+
+                <Grid Grid.Row="3">
+
+
+                    <Grid.ColumnDefinitions>
+
+                        <!-- 音量 -->
+
+                        <ColumnDefinition Width="328"/>
+
+                        <!-- インスタンス -->
+
+                        <ColumnDefinition Width="280"/>
+
+                        <!-- 停止 -->
+
+                        <ColumnDefinition Width="*"/>
+
+                    </Grid.ColumnDefinitions>
+
+
+                    <!-- ================================= -->
+                    <!-- 音量カード -->
+                    <!-- ================================= -->
+
+                    <Border Grid.Column="0"
+                            Style="{StaticResource BottomCard}"
+                            Margin="0,0,10,0">
+
+                        <Grid>
+
+
+                            <!-- テストボタンの分を確保 -->
+
+                            <Grid Margin="0,0,48,0">
+
+                                <Grid.RowDefinitions>
+
+                                    <RowDefinition Height="28"/>
+
+                                    <RowDefinition Height="*"/>
+
+                                </Grid.RowDefinitions>
+
+
+                                <!-- 現在の音量 -->
+
+                                <TextBlock Text="現在の音量"
+                                           Grid.Row="0"
+                                           Margin="12,0,0,0"
+                                           VerticalAlignment="Center"
+                                           FontSize="11"/>
+
+
+                                <!-- 音量数値 -->
+
+                                <TextBlock x:Name="currentVolumeText"
+                                           Grid.Row="0"
+                                           Text="100%"
+                                           Margin="0,0,12,0"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           FontSize="11"/>
+
+
+                                <!-- Slider -->
+
+                                <Slider x:Name="volumeSlider"
+                                        Grid.Row="1"
+                                        Margin="12,0,8,5"
+                                        VerticalAlignment="Center"
+                                        Maximum="100"
+                                        Value="100"
+                                        TickFrequency="1"
+                                        IsSnapToTickEnabled="True"
+                                        ValueChanged="Slider_ValueChanged"/>
+
+                            </Grid>
+
+
+                            <!-- ================================= -->
+                            <!-- テストボタン -->
+                            <!-- 右上・右下だけ角丸 -->
+                            <!-- ================================= -->
+
+                            <Button Grid.Row="0"
+                                    Grid.RowSpan="2"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Stretch"
+                                    Width="48"
+                                    Content="テスト"
+                                    Background="#FFF6D8"
+                                    BorderBrush="#E5E5E5"
+                                    Click="Ignition">
+
+                                <Button.Template>
+
+                                    <ControlTemplate TargetType="Button">
+
+                                        <Border x:Name="TestButtonBorder"
+                                                Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                CornerRadius="0,10,10,0">
+
+                                            <Grid>
+
+                                                <!-- ホバー -->
+                                                <Border x:Name="HoverLayer"
+                                                        Background="Black"
+                                                        Opacity="0"
+                                                        CornerRadius="0,10,10,0"/>
+
+                                                <!-- 文字 -->
+                                                <ContentPresenter
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"/>
+
+                                            </Grid>
+
+                                        </Border>
+
+                                        <ControlTemplate.Triggers>
+
+                                            <!-- ホバー -->
+
+                                            <Trigger Property="IsMouseOver"
+                                                     Value="True">
+
+                                                <Setter TargetName="HoverLayer"
+                                                        Property="Opacity"
+                                                        Value="0.08"/>
+
+                                            </Trigger>
+
+
+                                            <!-- 押しているとき -->
+
+                                            <Trigger Property="IsPressed"
+                                                     Value="True">
+
+                                                <Setter TargetName="HoverLayer"
+                                                        Property="Opacity"
+                                                        Value="0.18"/>
+
+                                            </Trigger>
+
+                                        </ControlTemplate.Triggers>
+
+                                    </ControlTemplate>
+
+                                </Button.Template>
+
+                            </Button>
+
+                        </Grid>
+
+                    </Border>
+
+
+                    <!-- ================================= -->
+                    <!-- 現在のインスタンス -->
+                    <!-- ================================= -->
+
+                    <Border Grid.Column="1"
+                            Style="{StaticResource BottomCard}"
+                            Margin="0,0,10,0">
+
+                        <Grid>
+
+
+                            <Grid.RowDefinitions>
+
+                                <RowDefinition Height="28"/>
+
+                                <RowDefinition Height="*"/>
+
+                            </Grid.RowDefinitions>
+
+
+                            <!-- タイトル -->
+
+                            <TextBlock Text="現在のインスタンス種類"
+                                       Grid.Row="0"
+                                       Margin="12,0,0,0"
+                                       VerticalAlignment="Center"
+                                       FontSize="11"/>
+
+
+                            <!-- 現在のインスタンス -->
+
+                            <TextBlock x:Name="currentInstanceText"
+                                       Grid.Row="1"
+                                       Text="ログ解析中"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       FontSize="13"/>
+
+                        </Grid>
+
+                    </Border>
+
+
+                    <!-- ================================= -->
+                    <!-- 動作中 / 停止中ボタン -->
+                    <!-- ================================= -->
+
+                    <Button x:Name="interruptButton"
+                            Grid.Column="2"
+                            Content="動作中"
+                            Background="#C1E5ED"
+                            BorderBrush="#C1E5ED"
+                            Click="boolButton_Click"
+                            FontSize="13">
+
+                        <Button.Template>
+
+                            <ControlTemplate TargetType="Button">
+
+                                <Border x:Name="InterruptButtonBorder"
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        CornerRadius="10">
+
+                                    <Grid>
+
+                                        <!-- ホバー -->
+                                        <Border x:Name="HoverLayer"
+                                                Background="Black"
+                                                Opacity="0"
+                                                CornerRadius="10"/>
+
+                                        <!-- 文字 -->
+                                        <ContentPresenter
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"/>
+
+                                    </Grid>
+
+                                </Border>
+
+                                <ControlTemplate.Triggers>
+
+                                    <!-- ホバー -->
+
+                                    <Trigger Property="IsMouseOver"
+                                             Value="True">
+
+                                        <Setter TargetName="HoverLayer"
+                                                Property="Opacity"
+                                                Value="0.08"/>
+
+                                    </Trigger>
+
+
+                                    <!-- 押しているとき -->
+
+                                    <Trigger Property="IsPressed"
+                                             Value="True">
+
+                                        <Setter TargetName="HoverLayer"
+                                                Property="Opacity"
+                                                Value="0.18"/>
+
+                                    </Trigger>
+
+                                </ControlTemplate.Triggers>
+
+                            </ControlTemplate>
+
+                        </Button.Template>
+
+                    </Button>
+
+                </Grid>
+
+            </Grid>
+
+        </Grid>
+
+    </Border>
+
 </Window>
