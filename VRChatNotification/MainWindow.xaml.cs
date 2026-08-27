@@ -22,6 +22,7 @@ namespace VRChatNotification
             Task.Run(() => CheckProcess());
             authUserNameTextBlock.Text = "ユーザーネーム不明";
             authUserIdTextBlock.Text = "ユーザーID不明";
+            interruptButton.Content = "動作中";
         }
 
         /* 
@@ -59,14 +60,14 @@ namespace VRChatNotification
          */
 
         // 音楽の再生準備
-        private async Task PlayJoinSound()
+        private void PlayJoinSound()
         {
             Debug.WriteLine("ここ疎通確認。2");
             _player.Open(new Uri(_joinSoundPath));
             _player.Play();
         }
 
-        private async Task PlayLeftSound()
+        private void PlayLeftSound()
         {
             Debug.WriteLine("ここ疎通確認。3");
             _player.Open(new Uri(_leftSoundPath));
@@ -75,11 +76,11 @@ namespace VRChatNotification
 
 
         // ボタンを押した際に、上記の関数を再生
-        private async void Ignition(object sender, RoutedEventArgs e)
+        private void Ignition(object sender, RoutedEventArgs e)
         {
             try
             {
-                await PlayJoinSound();
+                PlayJoinSound();
             }
             catch (Exception ex)
             {
@@ -87,11 +88,17 @@ namespace VRChatNotification
             }
         }
 
+        public SolidColorBrush stopColor = new SolidColorBrush(Color.FromRgb(237, 193, 194));
+        public SolidColorBrush playColor = new SolidColorBrush(Color.FromRgb(193, 229, 237));
+
+
         // 中断再生ボタン
         private void boolButton_Click(object sender, RoutedEventArgs e)
         {
             if (_interrupt == true)
             {
+                interruptButton.Background = stopColor;
+                interruptButton.Content = "停止中";
                 _cts?.Cancel();
                 _ctsProcess?.Cancel();
                 _interrupt = false;
@@ -100,6 +107,8 @@ namespace VRChatNotification
             }
             else if (_interrupt == false)
             {
+                interruptButton.Background = playColor;
+                interruptButton.Content = "動作中";
                 _readFileTask = Task.Run(() => ReadFile());
                 Task.Run(() => CheckProcess());
                 _interrupt = true;
