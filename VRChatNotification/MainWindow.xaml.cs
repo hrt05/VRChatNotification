@@ -35,9 +35,12 @@ namespace VRChatNotification
         private MediaPlayer _player = new MediaPlayer();
         private SelectClass _selectClass = new SelectClass();
         private InstanceTypeClass _instanceTypeClass = new InstanceTypeClass();
-        private string _joinSoundPath = Path.Combine(Directory.GetCurrentDirectory(), "sound", "joinSound.wav");
-        private string _leftSoundPath = Path.Combine(Directory.GetCurrentDirectory(), "sound", "leftSound.wav");
-        private string _logDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "Low", "VRChat", "VRChat");
+        //private string _joinSoundPath = Path.Combine(Directory.GetCurrentDirectory(), "sound", "joinSound.wav");
+        //private string _leftSoundPath = Path.Combine(Directory.GetCurrentDirectory(), "sound", "leftSound.wav");
+        private string _joinSoundPath = Path.Combine(AppContext.BaseDirectory, "sound", "joinSound.wav");
+        private string _leftSoundPath = Path.Combine(AppContext.BaseDirectory, "sound", "leftSound.wav");
+        //private string _logDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "Low", "VRChat", "VRChat");
+        private string _logDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "LocalLow", "VRChat", "VRChat");
         private bool _interrupt = true;
         private bool _isWorld = true;
         private string _userName = "unknown User";
