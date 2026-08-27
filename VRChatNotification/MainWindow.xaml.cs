@@ -1,9 +1,13 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media;
+//using System.Windows.Media.Animation;
+using System.Windows.Input;
 
 namespace VRChatNotification
 {
@@ -22,8 +26,9 @@ namespace VRChatNotification
             Task.Run(() => CheckProcess());
             authUserNameTextBlock.Text = "ユーザーネーム不明";
             authUserIdTextBlock.Text = "ユーザーID不明";
+            interruptButton.Background = playColor;
             interruptButton.Content = "動作中";
-        }
+       
 
         /* 
          * 変数などをここに記載
@@ -52,8 +57,6 @@ namespace VRChatNotification
         public InstanceType currentInstance { get; private set; } = InstanceType.Unknown;
         private bool _isLoading = false;
         private bool _isOnline = false;
-        //private double currentVolume = 100;
-
 
         /* 
          * 関数などをここに記載
@@ -129,7 +132,7 @@ namespace VRChatNotification
             {
                 return;
             }
-            currentVolumeText.Text = $"{e.NewValue:0}";
+            currentVolumeText.Text = $"{e.NewValue:0}%";
             //currentVolume = e.NewValue;
             _selectClass.CurrentVolume = (int)Math.Round(e.NewValue);
             changeJson();
@@ -319,7 +322,11 @@ namespace VRChatNotification
 
                     if (localByName.Length == 0)
                     {
-                        //Console.WriteLine("含まれていません1");
+                        Console.WriteLine("含まれていません1");
+                        currentInstance = InstanceType.Unknown;
+                        Dispatcher.Invoke(() => currentInstanceText.Text = "VRChat停止中");
+
+
                         _isOnline = false;
                         _cts?.Cancel();
 
@@ -353,6 +360,8 @@ namespace VRChatNotification
                             {
                                 //Debug.WriteLine("含まれていません2");
                                 //Console.WriteLine("含まれていません2");
+                                currentInstance = InstanceType.Unknown;
+                                Dispatcher.Invoke(() => currentInstanceText.Text = "VRChat停止中");
                                 _isOnline = false;
                                 await Task.Delay(500, _ctsProcess.Token);
                             }
@@ -608,7 +617,7 @@ namespace VRChatNotification
             privateBtn.Background = GetSelectColor(_selectClass.SelectPrivate);
             _isLoading = true;
             volumeSlider.Value = _selectClass.CurrentVolume;
-            currentVolumeText.Text = $"{_selectClass.CurrentVolume:0}";
+            currentVolumeText.Text = $"{_selectClass.CurrentVolume:0}%";
             _isLoading = false;
         }
 

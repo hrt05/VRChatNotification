@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VRChatNotification"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" Background="#FFF3F3F3">
+        Title="VRChatNotification" Height="450" Width="800" Background="#FFF3F3F3"
+        ResizeMode="CanMinimize">
     <Window.Resources>
         <!-- 全てのボタンに自動適用される共通スタイル -->
         <Style TargetType="Button">
@@ -22,6 +23,7 @@
                         <Border Background="{TemplateBinding Background}" 
                             BorderBrush="{TemplateBinding BorderBrush}" 
                             BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag}"
                             SnapsToDevicePixels="True">
                             <Grid>
                                 <!-- ホバー時に重ねる半透明の黒レイヤー -->
@@ -46,23 +48,162 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style TargetType="Slider">
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid VerticalAlignment="Center">
+                            <!-- 背景側の溝(グレー) -->
+                            <Border Height="4" Background="#FFE5E5E5" CornerRadius="2" VerticalAlignment="Center"/>
+
+                            <Track x:Name="PART_Track">
+                                <!-- つまみより左側(現在値までの部分)に色を付ける -->
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="Slider.DecreaseLarge">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Height="4" Background="#FFC1E5ED" CornerRadius="2" VerticalAlignment="Center"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+
+                                <!-- つまみより右側は透明(クリックで大きく増やす用の当たり判定だけ) -->
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="Slider.IncreaseLarge">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Background="Transparent"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.IncreaseRepeatButton>
+
+                                <!-- つまみ本体(白い丸+水色の枠) -->
+                                <Track.Thumb>
+                                    <Thumb x:Name="SliderThumb" Width="16" Height="16">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Ellipse x:Name="ThumbEllipse" Fill="White" Stroke="#FFC1E5ED" StrokeThickness="2"/>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsDragging" Value="True">
+                                                        <Setter TargetName="ThumbEllipse" Property="StrokeThickness" Value="3"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     <Grid>
-        <Slider x:Name="volumeSlider" HorizontalAlignment="Left" Margin="50,367,0,0" VerticalAlignment="Top" Width="120" Maximum="100" Value="100" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
-        <Button Content="確認" HorizontalAlignment="Left" Margin="226,333,0,0" VerticalAlignment="Top" Click="Ignition" Height="76" Width="40" Background="White"/>
-        <Button x:Name="interruptButton" Content="中断:再生" HorizontalAlignment="Left" Margin="630,333,0,0" VerticalAlignment="Top" Width="128" Height="76" Click="boolButton_Click" Background="#FFC1E5ED"/>
-        <TextBlock x:Name="currentInstanceText" HorizontalAlignment="Left" Margin="423,369,0,0" TextWrapping="Wrap" Text="ログ解析中" VerticalAlignment="Top"/>
-        <TextBlock x:Name="authUserIdTextBlock" HorizontalAlignment="Left" Margin="10,36,0,0" TextWrapping="Wrap" Text="UserId" VerticalAlignment="Top" Width="512"/>
-        <TextBlock x:Name="authUserNameTextBlock" HorizontalAlignment="Left" Margin="10,20,0,0" TextWrapping="Wrap" Text="UserName" VerticalAlignment="Top" Width="512"/>
-        <Button x:Name="publicBtn" Content="パブリック" HorizontalAlignment="Left" Margin="30,88,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="publicBtn_Click"/>
-        <Button x:Name="groupPublicBtn" Content="グループパブリック" HorizontalAlignment="Left" Margin="394,88,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="groupPublicBtn_Click"/>
-        <Button x:Name="groupPlusBtn" Content="グループ+" HorizontalAlignment="Left" Margin="30,147,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="groupPlusBtn_Click"/>
-        <Button x:Name="groupBtn" Content="グループオンリー" HorizontalAlignment="Left" Margin="394,147,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="groupBtn_Click"/>
-        <Button x:Name="hiddenBtn" Content="フレンド+" HorizontalAlignment="Left" Margin="30,206,0,0" VerticalAlignment="Top" Height="59" Width="366" Background="White" Click="hiddenBtn_Click"/>
-        <Button x:Name="friendsBtn" Content="フレンドオンリー" HorizontalAlignment="Left" Margin="394,206,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="friendsBtn_Click"/>
-        <Button x:Name="privatePlusBtn" Content="インバイト+" HorizontalAlignment="Left" Margin="30,265,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="privatePlusBtn_Click"/>
-        <Button x:Name="privateBtn" Content="インバイトオンリー" HorizontalAlignment="Left" Margin="394,265,0,0" VerticalAlignment="Top" Height="59" Width="370" Background="White" Click="privateBtn_Click"/>
-        <TextBlock x:Name="currentVolumeText" HorizontalAlignment="Left" Margin="121,333,0,0" TextWrapping="Wrap" Text="音量：" VerticalAlignment="Top"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- ヘッダー(タイトル・説明・ユーザー情報) -->
+            <RowDefinition Height="*"/>
+            <!-- インスタンス設定(見出し+ボタン一覧) 残り全部 -->
+            <RowDefinition Height="76"/>
+            <!-- 下段(音量・インスタンス種類・中断ボタン) 固定高さ -->
+        </Grid.RowDefinitions>
 
+        <!-- Row 0: ヘッダー -->
+        <Grid Grid.Row="0" Margin="31,7,31,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto" MaxWidth="300"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- 左側: タイトル・説明(残り幅いっぱい、右側の分は自動で圧迫される) -->
+            <Grid Grid.Column="0">
+                <TextBlock x:Name="Title" Text="VRChatNotification" FontSize="20" Foreground="#FF2C2C2C"/>
+                <TextBlock x:Name="Description" Margin="0,29,0,0" Text="ユーザーが参加した際に通知音を流します。" Foreground="#FF2C2C2C"/>
+            </Grid>
+
+            <!-- 右側: ユーザー情報専用の列(最大300pxまで、それ以上は省略表示) -->
+            <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                <TextBlock x:Name="authUserNameTextBlock" Text="UserName" Foreground="#FF2C2C2C"
+                   HorizontalAlignment="Right" TextAlignment="Right"
+                   TextTrimming="CharacterEllipsis" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
+                <TextBlock x:Name="authUserIdTextBlock" Text="UserId" Foreground="#FF2C2C2C" Margin="0,4,0,0"
+                   HorizontalAlignment="Right" TextAlignment="Right"
+                   TextTrimming="CharacterEllipsis" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Row 1: インスタンス設定見出し＋ボタン一覧 -->
+        <Grid Grid.Row="1" Margin="31,26,31,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0" BorderBrush="#FFE5E5E5" BorderThickness="1" CornerRadius="10,10,0,0" Background="#FFD6D7DA" Margin="0,-14,0,14">
+                <TextBlock Margin="9,4,6,4" Text="インスタンス設定" FontSize="14" Foreground="#FF2C2C2C"/>
+            </Border>
+            <Grid Margin="0,12,0,16" Grid.RowSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Button x:Name="publicBtn" Grid.Row="0" Grid.Column="0" Content="パブリック" Background="White" BorderBrush="#FFE5E5E5" Click="publicBtn_Click" Foreground="#FF2C2C2C"/>
+                <Button x:Name="groupPublicBtn" Grid.Row="0" Grid.Column="1" Content="グループパブリック" Background="White" BorderBrush="#FFE5E5E5" Click="groupPublicBtn_Click" Foreground="#FF2C2C2C"/>
+                <Button x:Name="groupPlusBtn" Grid.Row="1" Grid.Column="0" Content="グループ+" Background="#FFB9DED4" BorderBrush="#FFE5E5E5" Click="groupPlusBtn_Click" Foreground="#FF2C2C2C"/>
+                <Button x:Name="groupBtn" Grid.Row="1" Grid.Column="1" Content="グループオンリー" Background="#FFB9DED4" BorderBrush="#FFE5E5E5" Click="groupBtn_Click" Foreground="#FF2C2C2C"/>
+                <Button x:Name="hiddenBtn" Grid.Row="2" Grid.Column="0" Content="フレンド+" Background="#FFC7B8DB" BorderBrush="#FFE5E5E5" Click="hiddenBtn_Click" Foreground="#FF2C2C2C"/>
+                <Button x:Name="friendsBtn" Grid.Row="2" Grid.Column="1" Content="フレンドオンリー" Background="#FFC7B8DB" BorderBrush="#FFE5E5E5" Click="friendsBtn_Click" Foreground="#FF2C2C2C"/>
+                <Button x:Name="privatePlusBtn" Grid.Row="3" Grid.Column="0" Content="インバイト+" Background="#FFC7B8DB" BorderBrush="#FFE5E5E5" Tag="0,0,0,10" Click="privatePlusBtn_Click" Foreground="#FF2C2C2C"/>
+                <Button x:Name="privateBtn" Grid.Row="3" Grid.Column="1" Content="インバイトオンリー" Background="#FFC7B8DB" BorderBrush="#FFE5E5E5" Tag="0,0,10,0" Click="privateBtn_Click" Foreground="#FF2C2C2C"/>
+            </Grid>
+        </Grid>
+
+        <!-- Row 2: 下段(音量・インスタンス種類・中断ボタン) -->
+        <Grid Grid.Row="2" Margin="31,0,31,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320"/>
+                <ColumnDefinition Width="34"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="34"/>
+                <ColumnDefinition Width="126"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" BorderBrush="#FFE5E5E5" BorderThickness="1" Background="White" CornerRadius="10,10,10,10" Margin="0,0,0,14">
+                <Grid>
+                    <Button Content="確認" HorizontalAlignment="Left" Click="Ignition" Width="48" Background="#FFFFE2A2" Foreground="#FF2C2C2C" Margin="272,0,0,0" Tag="0,10,10,0" BorderBrush="#FFE5E5E5"/>
+                    <TextBlock x:Name="currentVolumeText" HorizontalAlignment="Left" Margin="236,5,0,0" VerticalAlignment="Top" Width="30" Foreground="#FF2C2C2C"><Run Language="ja-jp" Text="100%"/></TextBlock>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" Foreground="#FF2C2C2C"><Run Language="ja-jp" Text="現在の音量"/></TextBlock>
+                    <Slider x:Name="volumeSlider" HorizontalAlignment="Left" Margin="46,35,0,0" VerticalAlignment="Top" Width="188" Maximum="100" Value="100" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
+                    <Rectangle HorizontalAlignment="Left" Height="1" Margin="0,26,0,0" Stroke="#FFE5E5E5" VerticalAlignment="Top" Width="272"/>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="2" BorderBrush="#FFE5E5E5" BorderThickness="1" Background="White" CornerRadius="10,10,10,10" Margin="0,0,0,14">
+                <Grid>
+                    <TextBlock x:Name="currentInstanceText" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,37,0,0" Text="ログ解析中" Foreground="#FF2C2C2C"/>
+                    <Rectangle HorizontalAlignment="Center" Height="2" Stroke="#FFE5E5E5" VerticalAlignment="Center" Width="266"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,6,0,2" Text="現在のインスタンス種類" Foreground="#FF2C2C2C"/>
+                </Grid>
+            </Border>
+
+            <Button x:Name="interruptButton" Grid.Column="4" Content="中断:再生" Click="boolButton_Click" Background="#FFC1E5ED" Foreground="#FF2C2C2C" Tag="10" Margin="0,0,0,14"/>
+        </Grid>
+        <TextBlock HorizontalAlignment="Left" Margin="31,273,0,0" Grid.Row="1" TextWrapping="Wrap" Text="※クリックで変更できます。" VerticalAlignment="Top" FontSize="10" Foreground="#FF595959"/>
+        <TextBlock HorizontalAlignment="Left" Margin="565,273,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="#FF2C2C2C" FontSize="10"><Run Language="ja-jp" Text="通知音無し"/></TextBlock>
+        <TextBlock HorizontalAlignment="Left" Margin="635,273,0,0" Grid.Row="1" TextWrapping="Wrap" Text="入室のみ" VerticalAlignment="Top" Foreground="#FF2C2C2C" FontSize="10"/>
+        <TextBlock HorizontalAlignment="Left" Margin="692,273,0,0" Grid.Row="1" TextWrapping="Wrap" Text="入退出含め" VerticalAlignment="Top" Foreground="#FF2C2C2C" FontSize="10"/>
+        <Rectangle HorizontalAlignment="Left" Height="10" Margin="617,275,0,0" Grid.Row="1" VerticalAlignment="Top" Width="10" Fill="White"/>
+        <Rectangle HorizontalAlignment="Left" Height="10" Margin="677,275,0,0" Grid.Row="1" VerticalAlignment="Top" Width="10" Fill="#FFB2D2D2"/>
+        <Rectangle HorizontalAlignment="Left" Height="10" Margin="745,275,0,0" Grid.Row="1" VerticalAlignment="Top" Width="10" Fill="#FFBFB2D2"/>
     </Grid>
 </Window>
