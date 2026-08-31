@@ -137,16 +137,19 @@
             </StackPanel>
         </Grid>
 
-        <!-- Row 1: インスタンス設定見出し＋ボタン一覧 -->
-        <Grid Grid.Row="1" Margin="31,26,31,20">
+        <!-- Row 1: インスタンス設定見出し＋ボタン一覧＋注記 -->
+        <Grid Grid.Row="1" Margin="31,10,31,20">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <Border Grid.Row="0" BorderBrush="#FFE5E5E5" BorderThickness="1" CornerRadius="10,10,0,0" Background="#FFD6D7DA" Margin="0,-14,0,14">
+
+            <Border Grid.Row="0" BorderBrush="#FFE5E5E5" BorderThickness="1" CornerRadius="10,10,0,0" Background="#FFD6D7DA">
                 <TextBlock Margin="9,4,6,4" Text="インスタンス設定" FontSize="14" Foreground="#FF2C2C2C"/>
             </Border>
-            <Grid Margin="0,12,0,16" Grid.RowSpan="2">
+
+            <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
@@ -165,6 +168,31 @@
                 <Button x:Name="friendsBtn" Grid.Row="2" Grid.Column="1" Content="フレンドオンリー" Background="#FFC7B8DB" BorderBrush="#FFE5E5E5" Click="friendsBtn_Click" Foreground="#FF2C2C2C"/>
                 <Button x:Name="privatePlusBtn" Grid.Row="3" Grid.Column="0" Content="インバイト+" Background="#FFC7B8DB" BorderBrush="#FFE5E5E5" Tag="0,0,0,10" Click="privatePlusBtn_Click" Foreground="#FF2C2C2C"/>
                 <Button x:Name="privateBtn" Grid.Row="3" Grid.Column="1" Content="インバイトオンリー" Background="#FFC7B8DB" BorderBrush="#FFE5E5E5" Tag="0,0,10,0" Click="privateBtn_Click" Foreground="#FF2C2C2C"/>
+            </Grid>
+
+            <!-- 注記行: 左に説明、右に凡例 -->
+            <Grid Grid.Row="2" Margin="0,8,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="※クリックで変更できます。" FontSize="10" Foreground="#FF595959"/>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,12,0">
+                        <Rectangle Width="10" Height="10" Fill="White" Stroke="#FFE5E5E5" StrokeThickness="1" VerticalAlignment="Center"/>
+                        <TextBlock Text="通知音無し" FontSize="10" Foreground="#FF2C2C2C" Margin="4,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,12,0">
+                        <Rectangle Width="10" Height="10" Fill="#FFB2D2D2" VerticalAlignment="Center"/>
+                        <TextBlock Text="入室のみ" FontSize="10" Foreground="#FF2C2C2C" Margin="4,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Rectangle Width="10" Height="10" Fill="#FFBFB2D2" VerticalAlignment="Center"/>
+                        <TextBlock Text="入退出含め" FontSize="10" Foreground="#FF2C2C2C" Margin="4,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
             </Grid>
         </Grid>
 
@@ -198,12 +226,5 @@
 
             <Button x:Name="interruptButton" Grid.Column="4" Content="中断:再生" Click="boolButton_Click" Background="#FFC1E5ED" Foreground="#FF2C2C2C" Tag="10" Margin="0,0,0,14"/>
         </Grid>
-        <TextBlock HorizontalAlignment="Left" Margin="31,273,0,0" Grid.Row="1" TextWrapping="Wrap" Text="※クリックで変更できます。" VerticalAlignment="Top" FontSize="10" Foreground="#FF595959"/>
-        <TextBlock HorizontalAlignment="Left" Margin="565,273,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="#FF2C2C2C" FontSize="10"><Run Language="ja-jp" Text="通知音無し"/></TextBlock>
-        <TextBlock HorizontalAlignment="Left" Margin="635,273,0,0" Grid.Row="1" TextWrapping="Wrap" Text="入室のみ" VerticalAlignment="Top" Foreground="#FF2C2C2C" FontSize="10"/>
-        <TextBlock HorizontalAlignment="Left" Margin="692,273,0,0" Grid.Row="1" TextWrapping="Wrap" Text="入退出含め" VerticalAlignment="Top" Foreground="#FF2C2C2C" FontSize="10"/>
-        <Rectangle HorizontalAlignment="Left" Height="10" Margin="617,275,0,0" Grid.Row="1" VerticalAlignment="Top" Width="10" Fill="White"/>
-        <Rectangle HorizontalAlignment="Left" Height="10" Margin="677,275,0,0" Grid.Row="1" VerticalAlignment="Top" Width="10" Fill="#FFB2D2D2"/>
-        <Rectangle HorizontalAlignment="Left" Height="10" Margin="745,275,0,0" Grid.Row="1" VerticalAlignment="Top" Width="10" Fill="#FFBFB2D2"/>
     </Grid>
 </Window>
