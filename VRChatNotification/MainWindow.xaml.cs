@@ -28,7 +28,7 @@ namespace VRChatNotification
             authUserIdTextBlock.Text = "ユーザーID不明";
             interruptButton.Background = playColor;
             interruptButton.Content = "動作中";
-       
+        }
 
         /* 
          * 変数などをここに記載
