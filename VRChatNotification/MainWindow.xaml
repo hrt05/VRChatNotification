@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:VRChatNotification"
         mc:Ignorable="d"
         Title="VRChatNotification" Height="450" Width="800" Background="#FFF3F3F3"
-        ResizeMode="CanMinimize">
+        ResizeMode="CanMinimize"
+        Icon="Images/xamlIcon.ico">
     <Window.Resources>
         <!-- 全てのボタンに自動適用される共通スタイル -->
         <Style TargetType="Button">
@@ -15,6 +16,7 @@
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Foreground" Value="Black"/>
             <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Tag" Value="0"/>
 
             <Setter Property="Template">
                 <Setter.Value>

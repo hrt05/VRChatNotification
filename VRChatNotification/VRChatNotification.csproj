@@ -9,17 +9,24 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="sound\joinSound.wav" />
-    <None Remove="sound\leftSound.wav" />
+    <None Remove="Images\xamlIcon.ico" />
+    <None Remove="Sounds\joinSound.wav" />
+    <None Remove="Sounds\leftSound.wav" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="sound\joinSound.wav">
+    <Content Include="Sounds\joinSound.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="sound\leftSound.wav">
+    <Content Include="Sounds\leftSound.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\xamlIcon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
 </Project>

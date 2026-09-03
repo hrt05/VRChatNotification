@@ -1,12 +1,8 @@
 ﻿using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Windows;
-//using System.Windows.Media.Animation;
-using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Media;
 
 namespace VRChatNotification
@@ -22,8 +18,6 @@ namespace VRChatNotification
             checkJson();
             ApplySelectColors();
             _isLoading = true;
-            //InitDef();
-            //_readFileTask = Task.Run(() => ReadFile());
             if (Process.GetProcessesByName("VRChat").Length > 0)
             {
                 _isOnline = true;
@@ -47,11 +41,8 @@ namespace VRChatNotification
         private MediaPlayer _player = new MediaPlayer();
         private SelectClass _selectClass = new SelectClass();
         private InstanceTypeClass _instanceTypeClass = new InstanceTypeClass();
-        //private string _joinSoundPath = Path.Combine(Directory.GetCurrentDirectory(), "sound", "joinSound.wav");
-        //private string _leftSoundPath = Path.Combine(Directory.GetCurrentDirectory(), "sound", "leftSound.wav");
-        private string _joinSoundPath = Path.Combine(AppContext.BaseDirectory, "sound", "joinSound.wav");
-        private string _leftSoundPath = Path.Combine(AppContext.BaseDirectory, "sound", "leftSound.wav");
-        //private string _logDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "Low", "VRChat", "VRChat");
+        private string _joinSoundPath = Path.Combine(AppContext.BaseDirectory, "Sounds", "joinSound.wav");
+        private string _leftSoundPath = Path.Combine(AppContext.BaseDirectory, "Sounds", "leftSound.wav");
         private string _logDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "LocalLow", "VRChat", "VRChat");
         private bool _interrupt = true;
         private bool _isWorld = true;
@@ -139,7 +130,6 @@ namespace VRChatNotification
                 return;
             }
             currentVolumeText.Text = $"{e.NewValue:0}%";
-            //currentVolume = e.NewValue;
             _selectClass.CurrentVolume = (int)Math.Round(e.NewValue);
             changeJson();
         }
@@ -217,6 +207,12 @@ namespace VRChatNotification
 
                 return;
             }
+
+            if (line.Contains("[Behaviour] User is logged out"))
+            {
+                Dispatcher.Invoke(() => authUserNameTextBlock.Text = "ユーザーネーム不明");
+                Dispatcher.Invoke(() => authUserIdTextBlock.Text = "ユーザーID不明");
+            }
         }
 
         private void mutualInstanceType(string line)
@@ -275,8 +271,6 @@ namespace VRChatNotification
                     return;
                 }
 
-                //MessageBox.Show(latestF.FullName);
-
                 // FileStream: Fileを開く担当
                 // Fileの読み込みから！ Openして、Readのみ。　書き込み中でも読めるように
                 // IDisposable だからusingを使用
@@ -331,28 +325,6 @@ namespace VRChatNotification
             }
         }
 
-        //private void InitDef()
-        //{
-        //    try
-        //    {
-        //        Process[] VRChatProcess = Process.GetProcessesByName("VRChat");
-        //        // 実行時VRChatを起動していた場合
-        //        if (VRChatProcess.Length > 0)
-        //        {
-        //            _readFileTask = Task.Run(() => ReadFile());
-        //        }
-        //        // していなかった場合
-        //        else
-        //        {
-        //            Task.Run(() => CheckProcess());
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Debug.WriteLine(ex);
-        //    }
-        //}
-
         private bool IsFileOpenByAnotherProcess(string path)
         {
             try
@@ -374,7 +346,6 @@ namespace VRChatNotification
             try
             {
                 _ctsProcess = new CancellationTokenSource();
-                //string[] VRChatAllLog = Directory.GetFiles(_logDir, "output_log_*.txt");
 
                 while (!_ctsProcess.Token.IsCancellationRequested)
                 {
@@ -387,7 +358,6 @@ namespace VRChatNotification
                         {
                             var candidates = Directory.GetFiles(_logDir, "output_log_*.txt");
 
-                            //var activeFile = candidates.FirstOrDefault(f => IsFileOpenByAnotherProcess(f));
                             var activeFile = candidates.Select(f => new FileInfo(f)).OrderByDescending(f => f.LastWriteTime).FirstOrDefault(f => IsFileOpenByAnotherProcess(f.FullName));
 
                             if (activeFile != null)
@@ -398,61 +368,12 @@ namespace VRChatNotification
                                     _isOnline = true;
                                 }
                             }
-
-                            //var latestF = LatestRogFile();
-                            //if (latestF != null)
-                            //{
-                            //    if (VRChatAllLog.Select(Path.GetFileName).Contains(latestF.FullName))
-                            //    {
-                            //        while (VRChatAllLog.Select(Path.GetFileName).Contains(latestF.FullName))
-                            //        {
-                            //            var newF = LatestRogFile();
-                            //            if (newF != null)
-                            //            {
-                            //                latestF = newF;
-                            //            }
-                            //        }
-                            //    }
-                            //    else
-                            //    {
-                            //        if (_readFileTask == null || _readFileTask.IsCompleted)
-                            //        {
-                            //            _readFileTask = Task.Run(() => ReadFile());
-                            //        }
-                            //    }
-                            //}
                         }
                         await Task.Delay(500, _ctsProcess.Token);
                     }
                     // VRChatが終了したとき + 閉じているとき
                     else
                     {
-                        //foreach (Process vrcProcess in localByName)
-                        //{
-                        //    if (vrcProcess.ProcessName.Contains("VRChat"))
-                        //    {
-                        //        //Debug.WriteLine($"含まれています{vrcProcess.ProcessName}");
-                        //        //Console.WriteLine($"含まれています{vrcProcess.ProcessName}");
-                        //        if (_isOnline == false)
-                        //        {
-                        //            if (_readFileTask == null || _readFileTask.IsCompleted)
-                        //            {
-                        //                _readFileTask = Task.Run(() => ReadFile());
-                        //            }
-                        //        }
-                        //        _isOnline = true;
-                        //        await Task.Delay(500, _ctsProcess.Token);
-                        //    }
-                        //    else
-                        //    {
-                        //        //Debug.WriteLine("含まれていません2");
-                        //        //Console.WriteLine("含まれていません2");
-                        //        currentInstance = InstanceType.Unknown;
-                        //        Dispatcher.Invoke(() => currentInstanceText.Text = "VRChat停止中");
-                        //        _isOnline = false;
-                        //        await Task.Delay(500, _ctsProcess.Token);
-                        //    }
-                        //}
                         if (_isOnline)
                         {
                             currentInstance = InstanceType.Unknown;
@@ -469,135 +390,6 @@ namespace VRChatNotification
                 Debug.WriteLine(ex);
             }
         }
-
-        //private DateTime? _pendingVrcStartTime = null;
-
-        //private async Task CheckProcess()
-        //{
-        //    try
-        //    {
-        //        _ctsProcess = new CancellationTokenSource();
-
-
-        //        while (!_ctsProcess.Token.IsCancellationRequested)
-        //        {
-        //            Process[] localByName = Process.GetProcessesByName("VRChat");
-
-
-
-        //            // ###################################################################
-        //            // 起動したとき
-        //            if (localByName.Length > 0)
-        //            {
-        //                // VRChat起動中
-        //                if (_isOnline == false)
-        //                {
-        //                    // まだ今回起動分の開始時刻を記録していなければ記録する
-        //                    if (_pendingVrcStartTime == null)
-        //                    {
-        //                        try
-        //                        {
-        //                            _pendingVrcStartTime = localByName.Min(p => p.StartTime);
-        //                        }
-        //                        catch (Exception ex)
-        //                        {
-        //                            Debug.WriteLine($"StartTime取得失敗: {ex}");
-        //                        }
-        //                    }
-
-        //                    var latestF = LatestRogFile();
-
-        //                    // 最新ログファイルが「今回のVRChat起動より後」に作られていれば新しいログとみなす
-        //                    if (latestF != null && _pendingVrcStartTime != null &&
-        //                        latestF.CreationTime >= _pendingVrcStartTime.Value)
-        //                    {
-        //                        if (_readFileTask == null || _readFileTask.IsCompleted)
-        //                        {
-        //                            _readFileTask = Task.Run(() => ReadFile());
-        //                            _isOnline = true;
-        //                            _pendingVrcStartTime = null; // リセット
-        //                        }
-        //                    }
-        //                    // まだ古いログしかない場合は何もせず次のポーリングを待つ
-        //                }
-        //            }
-        //            // 閉じたとき
-        //            else
-        //            {
-        //                if (_isOnline)
-        //                {
-        //                    currentInstance = InstanceType.Unknown;
-        //                    Dispatcher.Invoke(() => currentInstanceText.Text = "VRChat停止中");
-        //                    _isOnline = false;
-        //                    _cts?.Cancel();
-        //                }
-        //                _pendingVrcStartTime = null;
-        //            }
-
-        //            await Task.Delay(500, _ctsProcess.Token);
-
-        //            //if (localByName.Length == 0)
-        //            //{
-        //            //    Console.WriteLine("含まれていません1");
-        //            //    currentInstance = InstanceType.Unknown;
-        //            //    Dispatcher.Invoke(() => currentInstanceText.Text = "VRChat停止中");
-
-
-        //                //    _isOnline = false;
-        //                //    _cts?.Cancel();
-
-        //                //    if (_readFileTask != null)
-        //                //    {
-        //                //        try { await _readFileTask; }
-        //                //        catch (Exception ex) { Debug.WriteLine($"旧ReadFileタスク終了待機中: {ex}"); }
-        //                //    }
-        //                //}
-        //            else
-        //            {
-        //                foreach (Process vrcProcess in localByName)
-        //                {
-        //                    if (vrcProcess.ProcessName.Contains("VRChat"))
-        //                    {
-        //                        //Debug.WriteLine($"含まれています{vrcProcess.ProcessName}");
-        //                        //Console.WriteLine($"含まれています{vrcProcess.ProcessName}");
-        //                        if (_isOnline == false)
-        //                        {
-        //                            if (_readFileTask == null || _readFileTask.IsCompleted)
-        //                            {
-        //                                _readFileTask = Task.Run(() => ReadFile());
-        //                            }
-        //                        }
-        //                        _isOnline = true;
-        //                        await Task.Delay(500, _ctsProcess.Token);
-        //                    }
-        //                    else
-        //                    {
-        //                        //Debug.WriteLine("含まれていません2");
-        //                        //Console.WriteLine("含まれていません2");
-        //                        currentInstance = InstanceType.Unknown;
-        //                        Dispatcher.Invoke(() => currentInstanceText.Text = "VRChat停止中");
-        //                        _isOnline = false;
-        //                        await Task.Delay(500, _ctsProcess.Token);
-        //                    }
-        //                    await Task.Delay(500, _ctsProcess.Token);
-        //                }
-        //            }
-        //            // ###################################################################
-
-
-
-        //        }
-        //    }
-        //    catch (TaskCanceledException)
-        //    {
-        //        Debug.WriteLine("停止しました。");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Debug.WriteLine("checkprocessでエラーが発生しましたエラーでてます", ex);
-        //        MessageBox.Show($"checkprocessでエラーが発生しました。{ex}");
-        //    }
-        //}
 
         public SolidColorBrush noSoundColor = new SolidColorBrush(Color.FromRgb(255, 255, 255));
         public SolidColorBrush joinOnlyColor = new SolidColorBrush(Color.FromRgb(178, 210, 210));
@@ -801,9 +593,6 @@ namespace VRChatNotification
                 return;
             }
             string jsonReadData = File.ReadAllText(jsonPath);
-
-            //using var sr = new StreamReader(_documentPath);
-            //var jsonReadData = sr.ReadToEnd();
 
             _selectClass = JsonSerializer.Deserialize<SelectClass>(jsonReadData) ?? new SelectClass();
         }
