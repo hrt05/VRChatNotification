@@ -374,14 +374,10 @@ namespace VRChatNotification
                     // VRChatが終了したとき + 閉じているとき
                     else
                     {
-                        if (_isOnline)
-                        {
-                            currentInstance = InstanceType.Unknown;
-                            Dispatcher.Invoke(() => currentInstanceText.Text = "VRChat停止中");
-                            _isOnline = false;
-                            _cts?.Cancel();
-                        }
-                        await Task.Delay(500, _ctsProcess.Token);
+                        currentInstance = InstanceType.Unknown;
+                        Dispatcher.Invoke(() => currentInstanceText.Text = "VRChat停止中");
+                        _isOnline = false;
+                        _cts?.Cancel();
                     }
                 }
             }
